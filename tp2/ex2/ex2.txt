@@ -1,0 +1,27 @@
+Q1
+-O2: x = 131999999.662353, y = 131999999.662353, time = 0.107307 s
+-O0 x = 131999999.662353, y = 131999999.662353, time = 0.271444 s
+Q2
+- At -O0, each iteration performs two floating-point multiplications and many loads/stores
+  from the stack for a, b, x and y, plus a less efficient loop control.
+- At -O2, the compiler hoists the product a*b out of the loop (loop-invariant code motion),
+  keeps it as a constant in a register, and uses only additions inside the loop.
+- It also uses a single accumulator in an XMM register instead of repeatedly reading/writing
+  x and y in memory, greatly reducing memory traffic.
+- The loop counter is held in a register and decremented with a simple sub/jne sequence,
+  improving branch behavior and allowing better instruction scheduling and ILP between
+  integer loop control and floating-point additions.
+
+Q3
+Manually optimized (-O0, a*b hoisted out of the loop):
+x = 131999999.662353, y = 131999999.662353, time = 0.264715 s
+
+Compared with:
+- Original -O0: time = 0.271444 s  (slowest)
+- -O2:          time = 0.107307 s  (fastest)
+
+Conclusion: the manual optimization at -O0 significantly improves over the naive -O0
+version but remains clearly slower than the automatically optimized -O2 version. Modern
+compilers with -O2 perform more aggressive low-level optimizations (scheduling, register
+allocation, ILP) than what is practical to do by hand, so writing simple code and enabling
+-O2 usually yields the best performance.

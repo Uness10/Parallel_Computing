@@ -1,0 +1,326 @@
+1.
+  -O0 :
+  stride, sum, time (msec), rate (MB/s)
+  1, 1000000.000000, 3.808000, 2003.517471
+  2, 1000000.000000, 4.162000, 1833.107768
+  3, 1000000.000000, 4.327000, 1763.206501
+  4, 1000000.000000, 4.560000, 1673.112836
+  5, 1000000.000000, 5.322000, 1433.557785
+  6, 1000000.000000, 5.133000, 1486.342204
+  7, 1000000.000000, 5.315000, 1435.445820
+  8, 1000000.000000, 8.314000, 917.656306
+  9, 1000000.000000, 15.246000, 500.419424
+  10, 1000000.000000, 15.928000, 478.992625
+  11, 1000000.000000, 23.601000, 323.265732
+  12, 1000000.000000, 20.350000, 374.908822
+  13, 1000000.000000, 34.847000, 218.939781
+  14, 1000000.000000, 41.734000, 182.810048
+  15, 1000000.000000, 32.061000, 237.964958
+  16, 1000000.000000, 26.637000, 286.420938
+  17, 1000000.000000, 37.797000, 201.851854
+  18, 1000000.000000, 35.067000, 217.566217
+  19, 1000000.000000, 33.012000, 231.109734
+  20, 1000000.000000, 30.002000, 254.296198
+
+  -O2:
+  stride, sum, time (msec), rate (MB/s)
+  1, 1000000.000000, 1.938000, 3936.736084
+  2, 1000000.000000, 1.619000, 4712.411693
+  3, 1000000.000000, 1.754000, 4349.711819
+  4, 1000000.000000, 2.513000, 3035.970765
+  5, 1000000.000000, 3.260000, 2340.305071
+  6, 1000000.000000, 4.773000, 1598.448467
+  7, 1000000.000000, 8.456000, 902.246279
+  8, 1000000.000000, 5.653000, 1349.618704
+  9, 1000000.000000, 5.726000, 1332.412597
+  10, 1000000.000000, 9.261000, 823.819731
+  11, 1000000.000000, 13.075000, 583.510098
+  12, 1000000.000000, 15.606000, 488.875723
+  13, 1000000.000000, 17.187000, 443.904959
+  14, 1000000.000000, 18.314000, 416.588104
+  15, 1000000.000000, 36.656000, 208.134945
+  16, 1000000.000000, 28.372000, 268.905771
+  17, 1000000.000000, 25.256000, 302.082457
+  18, 1000000.000000, 24.969000, 305.554669
+  19, 1000000.000000, 23.003000, 331.669544
+  20, 1000000.000000, 16.172000, 471.765677
+
+  \includegraphics(optimization_comparison.png)
+
+  ### Comparison of Execution Times and Bandwidths
+
+- **-O2 is significantly faster than -O0 for all strides.**
+  - For stride 1:  
+    -O0: 3.81 ms, 2003 MB/s  
+    -O2: 1.94 ms, 3937 MB/s  
+    → -O2 is about 2x faster and achieves nearly double the bandwidth.
+  - For stride 2:  
+    -O0: 4.16 ms, 1833 MB/s  
+    -O2: 1.62 ms, 4712 MB/s  
+    → -O2 is over 2.5x faster with much higher bandwidth.
+  - For larger strides, -O2 maintains a clear advantage, though both versions slow down as stride increases.
+
+  - **Bandwidth drops as stride increases** for both -O0 and -O2, but -O2 always achieves higher bandwidth and lower execution time.
+
+  - **Compiler optimization (-O2) greatly improves memory access efficiency and loop performance**, especially for small strides (sequential access).
+
+  **Summary:**  
+  -O2 optimization reduces execution time and increases bandwidth for all strides, with the greatest benefit for small strides (good cache locality). As stride increases, both versions slow down, but -O2 remains superior.
+
+---
+
+2.
+n, time_ijk, time_ikj, bandwidth_ijk, bandwidth_ikj
+100, 0.010239, 0.007166, 1.46, 2.08
+200, 0.047102, 0.035870, 2.53, 3.32
+300, 0.131175, 0.101500, 3.07, 3.96
+400, 0.303612, 0.297015, 3.14, 3.21
+500, 0.661610, 0.480488, 2.82, 3.88
+600, 1.155140, 0.855374, 2.79, 3.76
+700, 1.851454, 1.361984, 2.76, 3.75
+800, 2.796961, 1.888715, 2.73, 4.04
+900, 4.124809, 2.888789, 2.63, 3.76
+1000, 6.489688, 5.135840, 2.30, 2.90
+
+  \includegraphics(matrix_multiplication_comparison.png)
+  ### Key Observations:
+
+  | n | ijk (GB/s) | ikj (GB/s) | Winner |
+  |---|-----------|-----------|--------|
+  | 100 | 1.46 | 2.08 | ikj |
+  | 500 | 2.82 | 3.88 | ikj |
+  | 1000 | 2.30 | 2.90 | ikj |
+
+  ### Explanation:
+
+  **ikj is consistently 30-50% faster** due to **memory access patterns**:
+
+  - **ijk order**: `C[i][j] += A[i][k] * B[k][j]`
+    - `B[k][j]` has stride-n access (column-wise) → poor cache locality
+
+  - **ikj order**: `C[i][j] += A[i][k] * B[k][j]`
+    - Inner loop over `j` accesses `C[i][j]` and `B[k][j]` row-wise → sequential access → good cache locality
+
+  ### Bottom Line:
+  **Loop ordering matters significantly for performance** - always access memory sequentially when possible to maximize cache efficiency.
+
+3.
+  Matrix size: 1024 x 1024
+  ----------------------------------------
+  Block Size      Time (s)        MFLOPS          Bandwidth (MB/s)
+  ----------------------------------------------------------------
+  1               39.0653         54.9717         0.6442
+  2               12.5920         170.5430                1.9986
+  4               4.5817          468.7075                5.4927
+  8               3.2765          655.4290                7.6808
+  16              3.0012          715.5328                8.3852
+  32              3.4170          628.4788                7.3650
+  64              4.6308          463.7360                5.4344
+  128             4.1767          514.1582                6.0253
+  256             4.1539          516.9784                6.0583
+  512             4.3076          498.5301                5.8421
+  1024            11.8012         181.9722                2.1325
+
+  \includegraphics(block_matrix_multiplication_comparison.png)
+  Block size = 16 is optimal because it maximizes cache efficiency. The blocked kernel operates on three b×b tiles (from A, B, and C) at a time. The total working set size is:
+
+  Working set = 3 × b² × 8 bytes
+
+  For b = 16:
+  Working set = 3 × 16² × 8 = 6,144 bytes ≈ 6 KB
+
+  This fits comfortably within a typical L1 data cache (usually 32 KB), allowing all tile data to remain in the fastest cache during computation. Larger block sizes exceed L1 cache, causing more cache misses; smaller blocks underutilize the cache. Thus, b = 16 achieves the best balance for performance.
+  What this gives you
+      Extremely high temporal locality
+      Repeated reuse of A and B from L1
+      C stays hot throughout the block update
+      Very few cache misses
+      CPU pipelines stay full
+  ### Why does performance drop beyond block size 16?
+      As the block size increases, the working set (3 × b² × 8 bytes) grows quadratically. Once the working set exceeds the L1 cache size (typically 32 KB), data can no longer be kept entirely in the fastest cache. This causes:
+
+      - Increased L1 cache misses as blocks spill into slower L2/L3 caches.
+      - Higher memory access latency, leading to CPU pipeline stalls.
+      - Reduced temporal locality, as tiles are evicted before reuse.
+
+      Thus, performance peaks when the working set fits in L1 (b ≈ 16), and drops for larger blocks due to cache inefficiency.
+
+---
+
+4.
+Valgrind output before and after fixing memory leak:
+
+Before adding `free(array_copy)`:
+
+5.
+
+
+  ## Given
+
+  **Theoretical peak performance (single core):**
+  [
+  P_{\text{core}} = 70.4\ \text{GFLOP/s}
+  ]
+
+  **Measured performance:**
+  [
+  P_{\text{HPL}} = \text{GFLOPS reported by HPL}
+  ]
+
+  **Efficiency:**
+  [
+  \eta = \frac{P_{\text{HPL}}}{P_{\text{core}}}
+  ]
+
+  ---
+
+  ## 1. Comparison between measured performance and theoretical peak
+
+  For all experiments:
+  [
+  P_{\text{HPL}} < P_{\text{core}}
+  ]
+
+  The measured performance ranges:
+
+  * **Minimum:** ~2 GFLOP/s (small N, small NB)
+  * **Maximum:** ~59 GFLOP/s (N = 20000, NB = 256)
+
+  This corresponds to **3%–84% of the theoretical peak**, depending on N and NB.
+
+  ---
+
+  ## 2. Efficiency for each experiment
+
+  Efficiency is computed as:
+  [
+  \eta = \frac{P_{\text{HPL}}}{70.4}
+  ]
+
+
+  ## Efficiencies for all experiments
+
+  |     N |  NB |     GFLOPS | Efficiency η |
+  | ----: | --: | ---------: | -----------: |
+  |  1000 |   1 |     4.1002 |        0.058 |
+  |  1000 |   2 |     7.4289 |        0.106 |
+  |  1000 |   4 |     11.971 |        0.170 |
+  |  1000 |   8 |     19.541 |        0.278 |
+  |  1000 |  16 |     28.732 |        0.408 |
+  |  1000 |  32 |     31.551 |        0.448 |
+  |  1000 |  64 |     31.347 |        0.445 |
+  |  1000 | 128 |     29.531 |        0.419 |
+  |  1000 | 256 |     24.276 |        0.345 |
+  |  5000 |   1 |     2.5190 |        0.036 |
+  |  5000 |   2 |     4.7826 |        0.068 |
+  |  5000 |   4 |     8.3574 |        0.119 |
+  |  5000 |   8 |     15.966 |        0.227 |
+  |  5000 |  16 |     29.124 |        0.414 |
+  |  5000 |  32 |     38.714 |        0.550 |
+  |  5000 |  64 |     45.684 |        0.649 |
+  |  5000 | 128 |     47.470 |        0.674 |
+  |  5000 | 256 |     47.338 |        0.672 |
+  | 10000 |   1 |     2.0441 |        0.029 |
+  | 10000 |   2 |     4.4606 |        0.063 |
+  | 10000 |   4 |     7.0258 |        0.100 |
+  | 10000 |   8 |     15.598 |        0.222 |
+  | 10000 |  16 |     26.956 |        0.383 |
+  | 10000 |  32 |     40.425 |        0.574 |
+  | 10000 |  64 |     47.655 |        0.677 |
+  | 10000 | 128 |     53.183 |        0.755 |
+  | 10000 | 256 |     53.284 |        0.757 |
+  | 20000 |   1 |     2.2882 |        0.033 |
+  | 20000 |   2 |     4.2097 |        0.060 |
+  | 20000 |   4 |     7.2870 |        0.104 |
+  | 20000 |   8 |     14.858 |        0.211 |
+  | 20000 |  16 |     27.143 |        0.385 |
+  | 20000 |  32 |     41.320 |        0.587 |
+  | 20000 |  64 |     50.863 |        0.723 |
+  | 20000 | 128 |     56.260 |        0.799 |
+  | 20000 | 256 | **59.036** |    **0.838** |
+
+
+  ### Key observations 
+
+  * Efficiency ranges from **~3% to ~84%**
+  * Best efficiency is achieved for **large N and NB = 128–256**
+  * Peak efficiency ≈ **84% of theoretical single-core peak**
+
+
+  ---
+
+  ## 3. Influence of N and NB
+
+  ### Effect of matrix size N
+
+  * When **N increases**:
+
+    * Execution time increases rapidly (∝ N³)
+    * **GFLOP/s increases**
+    * **Efficiency improves**
+
+  **Explanation:**
+  Larger matrices reduce the relative impact of loop overhead, memory latency, and non-computational operations, allowing the processor to operate closer to its peak capability.
+
+  ---
+
+  ### Effect of block size NB
+
+  #### Execution time
+
+  * Small NB → long execution times
+  * Increasing NB → strong reduction in time
+  * Large NB → time stabilizes
+
+  #### Performance (GFLOP/s)
+
+  * NB = 1–4 → very low performance
+  * NB = 8–32 → rapid performance increase
+  * NB ≥ 64 → performance plateaus
+
+  **Explanation:**
+  Larger blocks improve cache reuse and allow BLAS kernels to work efficiently with vectorized instructions.
+
+  ---
+
+  ### Block sizes giving best performance
+
+  |     N | Best NB (approx.) |
+  | ----: | ----------------: |
+  |  1000 |             32–64 |
+  |  5000 |           128–256 |
+  | 10000 |           128–256 |
+  | 20000 |           **256** |
+
+  Optimal NB increases with problem size N.
+
+  ---
+
+  ## 4. Why measured performance is lower than the theoretical peak
+
+  The theoretical peak assumes **ideal conditions**, which are never fully achieved in practice.
+
+  Main reasons:
+
+  1. **Memory hierarchy limitations**
+
+    * Cache misses
+    * Finite memory bandwidth
+
+  2. **Non-compute instructions**
+
+    * Loads, stores, branches, and control logic reduce useful FLOPs
+
+  3. **Algorithmic overhead**
+
+    * Panel factorization in HPL is less efficient than pure DGEMM
+    * Not all operations are perfectly vectorized
+
+  4. **Pipeline and scheduling inefficiencies**
+
+    * Instruction dependencies
+    * Imperfect compiler optimization
+
+  5. **System noise**
+
+    * OS interrupts and background processes

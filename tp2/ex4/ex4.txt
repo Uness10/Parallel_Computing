@@ -1,0 +1,383 @@
+root@MyLen:/mnt/c/Users/youne/OneDrive/Desktop/UM6P-CS/CI/S4/Parall/tp2/ex4# valgrind --tool=callgrind ./ex4
+==3433== Callgrind, a call-graph generating cache profiler
+==3433== Copyright (C) 2002-2017, and GNU GPL'd, by Josef Weidendorfer et al.
+==3433== Using Valgrind-3.18.1 and LibVEX; rerun with -h for copyright info
+==3433== Command: ./ex4
+==3433== 
+==3433== For interactive control, run 'callgrind_control -h'.
+C[0] = 123.307200
+==3433==
+==3433== Events    : Ir
+==3433== Collected : 948847389
+==3433==
+==3433== I   refs:      948,847,389
+root@MyLen:/mnt/c/Users/youne/OneDrive/Desktop/UM6P-CS/CI/S4/Parall/tp2/ex4# callgrind_annotate callgrind.out.3433 
+--------------------------------------------------------------------------------
+Profile data file 'callgrind.out.3433' (creator: callgrind-3.18.1)
+--------------------------------------------------------------------------------
+I1 cache:
+D1 cache:
+LL cache:
+Timerange: Basic block 0 - 135034137
+Trigger: Program termination
+Profiled target:  ./ex4 (PID 3433, part 1)
+Events recorded:  Ir
+Events shown:     Ir
+Event sort order: Ir
+Thresholds:       99
+Include dirs:
+User annotated:
+Auto-annotation:  on
+
+--------------------------------------------------------------------------------
+Ir
+--------------------------------------------------------------------------------
+948,847,389 (100.0%)  PROGRAM TOTALS
+
+--------------------------------------------------------------------------------
+Ir                    file:function
+--------------------------------------------------------------------------------
+941,888,011 (99.27%)  ex4.c:matmul [/mnt/c/Users/youne/OneDrive/Desktop/UM6P-CS/CI/S4/Parall/tp2/ex4/ex4]
+
+--------------------------------------------------------------------------------
+-- Auto-annotated source: ex4.c
+--------------------------------------------------------------------------------
+Ir
+
+          .           #include <stdio.h>
+          .           #include <stdlib.h>
+          .
+          .           #define N 512 // Matrix size
+          .
+          .           /* ===== Generate noise ===== */
+          1 ( 0.00%)  void generate_noise(double *noise) {
+          5 ( 0.00%)      noise[0] = 1.0;
+      1,533 ( 0.00%)      for (int i = 1; i < N; i++) {
+      1,022 ( 0.00%)          noise[i] = noise[i - 1] * 1.0000001;
+          .               }
+          1 ( 0.00%)  }
+          .
+          .           /* ===== Matrices Initialization ===== */
+          6 ( 0.00%)  void init_matrix(double *M) {
+  1,572,866 ( 0.17%)      for (int i = 0; i < N * N; i++) {
+  5,242,880 ( 0.55%)          M[i] = (double)(i % 100) * 0.01;
+          .               }
+          2 ( 0.00%)  }
+          .
+          .           /*===== Matrix Multiplication ===== */
+      2,055 ( 0.00%)  void matmul(double *A, double *B, double *C, double *noise) {
+      1,536 ( 0.00%)      for (int i = 0; i < N; i++) {
+  1,049,600 ( 0.11%)          for (int j = 0; j < N; j++) {
+    786,433 ( 0.08%)              double sum = noise[i];
+537,133,056 (56.61%)              for (int k = 0; k < N; k++) {
+402,653,184 (42.44%)                  sum += A[i * N + k] * B[k * N + j];
+          .                       }
+    262,144 ( 0.03%)              C[i * N + j] = sum;
+          .                   }
+          .               }
+          3 ( 0.00%)  }
+          .
+          6 ( 0.00%)  int main() {
+          3 ( 0.00%)      double *A = malloc(N * N * sizeof(double));
+      1,909 ( 0.00%)  => ???:0x0000000000109090 (1x)
+          3 ( 0.00%)      double *B = malloc(N * N * sizeof(double));
+        292 ( 0.00%)  => ???:0x0000000000109090 (1x)
+          3 ( 0.00%)      double *C = malloc(N * N * sizeof(double));
+        292 ( 0.00%)  => ???:0x0000000000109090 (1x)
+          2 ( 0.00%)      double *noise = malloc(N * sizeof(double));
+        187 ( 0.00%)  => ???:0x0000000000109090 (1x)
+          .
+          9 ( 0.00%)      if (!A || !B || !C || !noise) {
+          .                   fprintf(stderr, "Memory allocation failed\n");
+          .                   return 1;
+          .               }
+          .
+          2 ( 0.00%)      generate_noise(noise);
+      2,562 ( 0.00%)  => ex4.c:generate_noise (1x)
+          2 ( 0.00%)      init_matrix(A);
+  3,407,877 ( 0.36%)  => ex4.c:init_matrix (1x)
+          2 ( 0.00%)      init_matrix(B);
+  3,407,877 ( 0.36%)  => ex4.c:init_matrix (1x)
+          .
+          5 ( 0.00%)      matmul(A, B, C, noise);
+941,888,011 (99.27%)  => ex4.c:matmul (1x)
+          .
+          .               printf("C[0] = %f\n", C[0]);
+          .
+          2 ( 0.00%)      free(A);
+         68 ( 0.00%)  => ???:0x0000000000109080 (1x)
+          2 ( 0.00%)      free(B);
+         68 ( 0.00%)  => ???:0x0000000000109080 (1x)
+          2 ( 0.00%)      free(C);
+         68 ( 0.00%)  => ???:0x0000000000109080 (1x)
+          2 ( 0.00%)      free(noise);
+        134 ( 0.00%)  => ???:0x0000000000109080 (1x)
+          .
+          1 ( 0.00%)      return 0;
+          6 ( 0.00%)  }
+--------------------------------------------------------------------------------
+Ir
+--------------------------------------------------------------------------------
+948,706,379 (99.99%)  events annotated
+
+
+1.
+From the profiling data (excluding main), the vast majority of instruction references (Ir) are spent in the `matmul` function: 941,888,011 out of 948,847,389 Ir, or about 99.27%. Within `matmul`, the innermost `k` loop (the actual matrix multiplication computation) accounts for approximately 99.05% of the total Ir, indicating that almost all computation time is spent here. The overhead from loop control and memory writes is negligible.
+
+The functions `generate_noise` and `init_matrix` together account for less than 1% of the total Ir, so their contribution to the overall runtime is minimal.
+
+Analyzing parallelizability:
+- The outer loops over `i` and `j` in `matmul` are fully parallelizable, as each (i, j) computation is independent.
+- The inner `k` loop is a reduction (sum), which is sequential per (i, j) element but can be computed in parallel for different elements.
+- Globally, the computation is highly parallelizable, with only a small sequential fraction due to reductions and minimal overhead.
+
+Therefore, the sequential fraction (fs) is approximately 0.3%, and the parallel fraction (fp) is approximately 99.7%:
+
+fs ≈ 0.003  
+fp ≈ 0.997
+
+This means the code is highly amenable to parallelization, with nearly all of the computation being parallel.
+
+2.
+Using Amdahl's Law for strong scaling:
+
+S(P) = 1 / (fs + (1-fs) / P)
+
+With fs ≈ 0.003  the speedup values for different processor counts P are:
+
+| p (cores) | Theoretical Speedup S(p) |
+|-----------|-------------------------|
+| 1        | 1.00                     |
+| 2        | 1.99                     |
+| 4        | 3.96                     |
+| 8        | 7.84                     |
+| 16       | 15.31                    |
+| 32       | 29.28                    |
+| 64       | 53.83                    |
+
+This demonstrates that the code achieves near-linear speedup for a large number of processors, limited only by the small sequential fraction.
+3.
+Using Gustafson's Law for weak scaling:
+
+SG(P) = P - fs * (P - 1)
+
+With fs ≈ 0.003, the speedup values for different processor counts P are:
+
+|   P   | SG(P)  |
+|-------|--------|
+|   1   |  1.00  |
+|   2   |  1.997 |
+|   4   |  3.991 |
+|   8   |  7.979 |
+|  16   | 15.960 |
+|  32   | 31.910 |
+|  64   | 63.810 |
+
+This shows nearly linear scaling, confirming the code's high parallelizability.
+
+4. includegraphics{41.png} // curve of p=S(p)
+ includegraphics{42.png} //curves p=S(p) and p=SG(p)
+
+5. For N=128
+    ==3581== Callgrind, a call-graph generating cache profiler
+    ==3581== Copyright (C) 2002-2017, and GNU GPL'd, by Josef Weidendorfer et al.
+    ==3581== Using Valgrind-3.18.1 and LibVEX; rerun with -h for copyright info
+    ==3581== Command: ./ex4
+    ==3581== 
+    ==3581== For interactive control, run 'callgrind_control -h'.
+    C[0] = 26.724000
+    ==3581== 
+    ==3581== Events    : Ir
+    ==3581== Collected : 15396011
+    ==3581==
+    ==3581== I   refs:      15,396,011
+    root@MyLen:/mnt/c/Users/youne/OneDrive/Desktop/UM6P-CS/CI/S4/Parall/tp2/ex4# 
+    callgrind_annotate callgrind.out.3581 
+    --------------------------------------------------------------------------------
+    Profile data file 'callgrind.out.3581' (creator: callgrind-3.18.1)
+    --------------------------------------------------------------------------------
+    I1 cache:
+    D1 cache:
+    LL cache:
+    Timerange: Basic block 0 - 2175428
+    Trigger: Program termination
+    Profiled target:  ./ex4 (PID 3581, part 1)
+    Events recorded:  Ir
+    Events shown:     Ir
+    Event sort order: Ir
+    Thresholds:       99
+    Include dirs:
+    User annotated:
+    Auto-annotation:  on
+
+    --------------------------------------------------------------------------------
+    Ir
+    --------------------------------------------------------------------------------
+    15,396,011 (100.0%)  PROGRAM TOTALS
+
+    --------------------------------------------------------------------------------
+    Ir                   file:function
+    --------------------------------------------------------------------------------
+    14,828,683 (96.32%)  ex4.c:matmul [/mnt/c/Users/youne/OneDrive/Desktop/UM6P-CS/CI/S4/Parall/tp2/ex4/ex4]
+    425,994 ( 2.77%)  ex4.c:init_matrix [/mnt/c/Users/youne/OneDrive/Desktop/UM6P-CS/CI/S4/Parall/tp2/ex4/ex4]
+
+    --------------------------------------------------------------------------------
+    -- Auto-annotated source: ex4.c
+    --------------------------------------------------------------------------------
+    Ir
+
+            .           #include <stdio.h>
+            .           #include <stdlib.h>
+            .
+            .           #define N 128 // Matrix size
+            .
+            .           /* ===== Generate noise ===== */
+            1 ( 0.00%)  void generate_noise(double *noise) {
+            5 ( 0.00%)      noise[0] = 1.0;
+        381 ( 0.00%)      for (int i = 1; i < N; i++) {
+        254 ( 0.00%)          noise[i] = noise[i - 1] * 1.0000001;
+            .               }
+            1 ( 0.00%)  }
+            .
+            .           /* ===== Matrices Initialization ===== */
+            6 ( 0.00%)  void init_matrix(double *M) {
+    98,306 ( 0.64%)      for (int i = 0; i < N * N; i++) {
+    327,680 ( 2.13%)          M[i] = (double)(i % 100) * 0.01;
+            .               }
+            2 ( 0.00%)  }
+            .
+            .           /*===== Matrix Multiplication ===== */
+        519 ( 0.00%)  void matmul(double *A, double *B, double *C, double *noise) {
+        384 ( 0.00%)      for (int i = 0; i < N; i++) {
+    65,792 ( 0.43%)          for (int j = 0; j < N; j++) {
+    49,153 ( 0.32%)              double sum = noise[i];
+    8,404,992 (54.59%)              for (int k = 0; k < N; k++) {
+    6,291,456 (40.86%)                  sum += A[i * N + k] * B[k * N + j];      
+            .                       }
+    16,384 ( 0.11%)              C[i * N + j] = sum;
+            .                   }
+            .               }
+            3 ( 0.00%)  }
+            .
+            6 ( 0.00%)  int main() {
+            3 ( 0.00%)      double *A = malloc(N * N * sizeof(double));
+        1,811 ( 0.01%)  => ???:0x0000000000109090 (1x)
+            3 ( 0.00%)      double *B = malloc(N * N * sizeof(double));
+        292 ( 0.00%)  => ???:0x0000000000109090 (1x)
+            3 ( 0.00%)      double *C = malloc(N * N * sizeof(double));
+        292 ( 0.00%)  => ???:0x0000000000109090 (1x)
+            2 ( 0.00%)      double *noise = malloc(N * sizeof(double));
+        194 ( 0.00%)  => ???:0x0000000000109090 (1x)
+            .
+            9 ( 0.00%)      if (!A || !B || !C || !noise) {
+            .                   fprintf(stderr, "Memory allocation failed\n");   
+            .                   return 1;
+            .               }
+            .
+            2 ( 0.00%)      generate_noise(noise);
+        642 ( 0.00%)  => ex4.c:generate_noise (1x)
+            2 ( 0.00%)      init_matrix(A);
+    212,997 ( 1.38%)  => ex4.c:init_matrix (1x)
+            2 ( 0.00%)      init_matrix(B);
+    212,997 ( 1.38%)  => ex4.c:init_matrix (1x)
+            .
+            5 ( 0.00%)      matmul(A, B, C, noise);
+    14,828,683 (96.32%)  => ex4.c:matmul (1x)
+            .
+            .               printf("C[0] = %f\n", C[0]);
+            .
+            2 ( 0.00%)      free(A);
+        145 ( 0.00%)  => ???:0x0000000000109080 (1x)
+            2 ( 0.00%)      free(B);
+        68 ( 0.00%)  => ???:0x0000000000109080 (1x)
+            2 ( 0.00%)      free(C);
+        68 ( 0.00%)  => ???:0x0000000000109080 (1x)
+            2 ( 0.00%)      free(noise);
+        91 ( 0.00%)  => ???:0x0000000000109080 (1x)
+            .
+            1 ( 0.00%)      return 0;
+            6 ( 0.00%)  }
+    --------------------------------------------------------------------------------
+    Ir
+    --------------------------------------------------------------------------------
+    15,255,371 (99.09%)  events annotated
+
+================================================================================
+ANALYSIS FOR N=128
+================================================================================
+
+Profiling Data Summary (N=128)
+---------------------------------
+Total Instructions (excluding main overhead): ~15,255,319
+
+| Function        | Instructions   | Percentage |
+|-----------------|----------------|------------|
+| matmul          | 14,828,683     | 97.20%     |
+| init_matrix (2x)| 425,994        | 2.79%      |
+| generate_noise  | 642            | ~0.004%    |
+
+ Sequential vs Parallelizable Analysis
+----------------------------------------
+- **Strictly Sequential**: 
+  - `generate_noise`: 642 Ir (each iteration depends on previous: noise[i] = noise[i-1] * 1.0000001)
+
+- **Parallelizable**:
+  - `matmul` outer loops (i, j): fully parallelizable
+  - `init_matrix`: fully parallelizable (each element independent)
+  - Inner k-loop: reduction per element (parallelizable across i,j)
+  - Total parallelizable: ~15,254,677 Ir
+
+Sequential fraction:
+    fs = 642 / 15,255,319 ≈ 0.000042 (0.0042%)
+    fp = 1 - fs ≈ 0.999958 (99.996%)
+
+ Amdahl's Law - Strong Scaling (N=128)
+----------------------------------------
+S(P) = 1 / (fs + (1-fs)/P)  with fs ≈ 0.000042
+
+| p (cores) | Theoretical Speedup S(p) |
+|-----------|-------------------------|
+| 1        | 1.00                     |
+| 2        | 2.00                     |
+| 4        | 4.00                     |
+| 8        | 8.00                     |
+| 16       | 15.99                    |
+| 32       | 31.96                    |
+| 64       | 63.83                    |
+
+Maximum speedup (P → ∞): 1/fs ≈ 23,809x
+
+ Gustafson's Law - Weak Scaling (N=128)
+-----------------------------------------
+SG(P) = P - fs × (P - 1)  with fs ≈ 0.000042
+
+| P (cores) | Gustafson Speedup SG(P) |
+|-----------|-------------------------|
+| 1         | 1.000                   |
+| 2         | 1.99996                 |
+| 4         | 3.99987                 |
+| 8         | 7.99971                 |
+| 16        | 15.99937                |
+| 32        | 31.99870                |
+| 64        | 63.99735                |
+
+ Comparison: N=128 vs N=512
+-----------------------------
+| Metric              | N=128       | N=512       |
+|---------------------|-------------|-------------|
+| Total Ir            | 15.3M       | 948.7M      |
+| matmul %            | 97.20%      | 99.27%      |
+| init_matrix %       | 2.79%       | 0.72%       |
+| generate_noise Ir   | 642         | 2,562       |
+| Sequential fraction | 0.0042%     | 0.00027%    |
+| Max Amdahl speedup  | ~23,809x    | ~370,370x   |
+
+includegraphics{43.png} // p=S(p) and p=SG(p) curves
+
+**Key Observation**: 
+- The only truly sequential code is `generate_noise()` due to loop-carried dependency
+- Both N=128 and N=512 have extremely small sequential fractions (<0.01%)
+- The code is almost perfectly parallelizable
+- As N increases, fs decreases (generate_noise is O(N), matmul is O(N³))
+- Practical speedup will be limited by memory bandwidth and cache effects, not Amdahl's Law
+

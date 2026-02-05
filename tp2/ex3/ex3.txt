@@ -1,0 +1,471 @@
+Question 1
+    - 1: The strictly sequential part of the program is the loop in add_noise,
+        because each iteration uses a[i-1], the result of the previous iteration.
+        The loop in reduction also accumulates into 'sum', but since addition is
+        associative and commutative, this loop can be parallelized using a
+        parallel reduction (tree-based) algorithm, so it is not strictly
+        sequential.
+    - 2: The parallelizable parts are:
+        * the loop in init_b (each b[i] depends only on i),
+        * the loop in compute_addition (each c[i] depends only on a[i], b[i]),
+        * the loop in reduction, using a parallel reduction pattern on 'sum'.
+    - 3: Time complexity as a function of N:
+        * add_noise: Θ(N)  (single loop over N elements).
+        * init_b: Θ(N)     (single loop over N elements).
+        * compute_addition: Θ(N) (single loop over N elements).
+        * reduction: Θ(N)  (single loop over N elements).
+        * main: Θ(N), since it calls a constant number of Θ(N) functions.
+Question 2
+    root@MyLen:/mnt/c/Users/youne/OneDrive/Desktop/UM6P-CS/CI/S4/Parall/tp2/ex3# gcc -O2 -g ex3.c -o ex3
+    root@MyLen:/mnt/c/Users/youne/OneDrive/Desktop/UM6P-CS/CI/S4/Parall/tp2/ex3# valgrind --tool=callgrind ./ex3
+    ==3113== Callgrind, a call-graph generating cache profiler
+    ==3113== Copyright (C) 2002-2017, and GNU GPL'd, by Josef Weidendorfer et al.  
+    ==3113== Using Valgrind-3.18.1 and LibVEX; rerun with -h for copyright info    
+    ==3113== Command: ./ex3
+    ==3113==
+    ==3113== For interactive control, run 'callgrind_control -h'.
+    ^ZSum = 2500220229549075.500000
+    ==3113==
+    ==3113== Events    : Ir
+    ==3113== Collected : 2200140720
+    ==3113==
+    ==3113== I   refs:      2,200,140,720
+
+    callgrind_annotate callgrind.out.3113 
+    --------------------------------------------------------------------------------
+    Profile data file 'callgrind.out.3113' (creator: callgrind-3.18.1)
+    --------------------------------------------------------------------------------
+    I1 cache:
+    D1 cache:
+    LL cache:
+    Timerange: Basic block 0 - 400028919
+    Trigger: Program termination
+    Profiled target:  ./ex3 (PID 3113, part 1)
+    Events recorded:  Ir
+    Events shown:     Ir
+    Event sort order: Ir
+    Thresholds:       99
+    Include dirs:
+    User annotated:
+    Auto-annotation:  on
+
+    --------------------------------------------------------------------------------
+    Ir
+    --------------------------------------------------------------------------------
+    2,200,140,720 (100.0%)  PROGRAM TOTALS
+
+    --------------------------------------------------------------------------------
+    Ir                      file:function
+    --------------------------------------------------------------------------------
+    1,100,000,037 (50.00%)  ex3.c:main [/mnt/c/Users/youne/OneDrive/Desktop/UM6P-CS/CI/S4/Parall/tp2/ex3/ex3]
+    600,000,004 (27.27%)  ex3.c:compute_addition [/mnt/c/Users/youne/OneDrive/Desktop/UM6P-CS/CI/S4/Parall/tp2/ex3/ex3]
+    500,000,002 (22.73%)  ex3.c:add_noise [/mnt/c/Users/youne/OneDrive/Desktop/UM6P-CS/CI/S4/Parall/tp2/ex3/ex3]
+
+    --------------------------------------------------------------------------------
+    -- Auto-annotated source: ex3.c
+    --------------------------------------------------------------------------------
+    Ir
+
+            .           #include <stdio.h>
+            .           #include <stdlib.h>
+            .
+            .           #define N 100000000
+            .
+            1 ( 0.00%)  void add_noise(double *a) {
+            5 ( 0.00%)      a[0] = 1.0;
+            .               // Strictly sequential: a[i] depends on a[i-1], so iterations cannot run in parallel.
+    299,999,997 (13.64%)      for (int i = 1; i < N; i++) {
+    199,999,998 ( 9.09%)          a[i] = a[i - 1] * 1.0000001;
+            .               }
+            1 ( 0.00%)  }
+            .
+            .           /*===== Initialization ===== */
+            .           void init_b(double *b) {
+    300,000,001 (13.64%)      for (int i = 0; i < N; i++) {
+    400,000,000 (18.18%)          b[i] = i * 0.5;
+            .               }
+            .           }
+            .
+            .           /*===== Compute addition===== */
+            3 ( 0.00%)  void compute_addition(double *a, double *b, double *c) { 
+    300,000,000 (13.64%)      for (int i = 0; i < N; i++) {
+    300,000,000 (13.64%)          c[i] = a[i] + b[i];
+            .               }
+            1 ( 0.00%)  }
+            .
+            .           /*===== Reduction===== */
+            .           double reduction(double *c) {
+            2 ( 0.00%)      double sum = 0.0;
+    300,000,002 (13.64%)      for (int i = 0; i < N; i++) {
+    100,000,000 ( 4.55%)          sum += c[i];
+            .               }
+            .               return sum;
+            .           }
+            .
+            4 ( 0.00%)  int main() {
+            3 ( 0.00%)      double *a = malloc(N * sizeof(double));
+        1,909 ( 0.00%)  => ???:0x0000000000109080 (1x)
+            3 ( 0.00%)      double *b = malloc(N * sizeof(double));
+            292 ( 0.00%)  => ???:0x0000000000109080 (1x)
+            3 ( 0.00%)      double *c = malloc(N * sizeof(double));
+            292 ( 0.00%)  => ???:0x0000000000109080 (1x)
+            .
+            4 ( 0.00%)      add_noise(a);
+    500,000,002 (22.73%)  => ex3.c:add_noise (1x)
+            .               init_b(b);
+            4 ( 0.00%)      compute_addition(a, b, c);
+            .               double sum = reduction(c);
+            .               printf("Sum = %f\n", sum);
+            .
+            2 ( 0.00%)      free(a);
+            63 ( 0.00%)  => ???:0x0000000000109070 (1x)
+            2 ( 0.00%)      free(b);
+            63 ( 0.00%)  => ???:0x0000000000109070 (1x)
+            2 ( 0.00%)      free(c);
+            63 ( 0.00%)  => ???:0x0000000000109070 (1x)
+            .               return 0;
+            5 ( 0.00%)  }
+    --------------------------------------------------------------------------------
+    Ir
+    --------------------------------------------------------------------------------
+    2,200,000,043 (99.99%)  events annotated
+
+    Based on the Callgrind instruction counts, the strictly sequential parts of the program 
+    are add_noise and reduction,
+     as both involve loop-carried dependencies. 
+    The total instruction count is 2,200,140,720, with the sequential portion (add_noise and reduction) 
+    accounting for
+     approximately 900,000,004 instructions. Thus, the sequential fraction is:
+
+    Sequential instructions:
+
+    add_noise → 500,000,002
+
+    Total:
+    Total Ir = 2,200,140,720
+
+    Correct fs:
+    fs = 500,000,002 / 2,200,140,720 ≈ 0.227
+
+    ✅ fs ≈ 0.23 (23%)
+
+Question 3
+    Using Amdahl's Law:
+
+    S(p) = 1 / (fs + (1 - fs)/p)
+
+    With fs = 0.23:
+    | p (cores) | Theoretical Speedup S(p) |
+    |-----------|-------------------------|
+    | 1         | 1.00                    |
+    | 2         | 1.63                    |
+    | 4         | 2.38                    |
+    | 8         | 3.09                    |
+    | 16        | 3.63                    |
+    | 32        | 3.98                    |
+    | 64        | 4.18                    |
+
+    As p increases, the speedup approaches the theoretical maximum of 1/fs ≈ 4.35, showing diminishing returns due to the sequential fraction.
+
+    According to Amdahl’s Law, the speedup of a program is limited by its sequential fraction (fs). As the number of processors p increases, the parallel portion accelerates, but the sequential part remains unchanged. In the limit as p → ∞, the maximum speedup is Smax = 1/fs. With fs ≈ 0.23, the theoretical speedup limit is about 4.35. Thus, regardless of processor count, the sequential portion ultimately constrains performance, causing the speedup to plateau.
+
+Question 4
+1. 
+    For N=5e6:
+        root@MyLen:/mnt/c/Users/youne/OneDrive/Desktop/UM6P-CS/CI/S4/Parall/tp2/ex3# valgrind --tool=callgrind ./ex3
+        ==3168== Callgrind, a call-graph generating cache profiler
+        ==3168== Copyright (C) 2002-2017, and GNU GPL'd, by Josef Weidendorfer et al.
+        ==3168== Using Valgrind-3.18.1 and LibVEX; rerun with -h for copyright info
+        ==3168== Command: ./ex3
+        ==3168== 
+        ==3168== For interactive control, run 'callgrind_control -h'.
+        Sum = 6250005237212.519531
+        ==3168== 
+        ==3168== Events    : Ir
+        ==3168== Collected : 110141697
+        ==3168==
+        ==3168== I   refs:      110,141,697
+        root@MyLen:/mnt/c/Users/youne/OneDrive/Desktop/UM6P-CS/CI/S4/Parall/tp2/ex3# callgrind_annotate callgrind.out.3168 
+        --------------------------------------------------------------------------------
+        Profile data file 'callgrind.out.3168' (creator: callgrind-3.18.1)
+        --------------------------------------------------------------------------------
+        I1 cache:
+        D1 cache:
+        LL cache:
+        Timerange: Basic block 0 - 20029148
+        Trigger: Program termination
+        Profiled target:  ./ex3 (PID 3168, part 1)
+        Events recorded:  Ir
+        Events shown:     Ir
+        Event sort order: Ir
+        Thresholds:       99
+        Include dirs:
+        User annotated:
+        Auto-annotation:  on
+
+        --------------------------------------------------------------------------------
+        Ir
+        --------------------------------------------------------------------------------
+        110,141,697 (100.0%)  PROGRAM TOTALS
+
+        --------------------------------------------------------------------------------
+        Ir                   file:function
+        --------------------------------------------------------------------------------
+        55,000,037 (49.94%)  ex3.c:main [/mnt/c/Users/youne/OneDrive/Desktop/UM6P-CS/CI/S4/Parall/tp2/ex3/ex3]   
+        30,000,004 (27.24%)  ex3.c:compute_addition [/mnt/c/Users/youne/OneDrive/Desktop/UM6P-CS/CI/S4/Parall/tp2/ex3/ex3]
+        25,000,002 (22.70%)  ex3.c:add_noise [/mnt/c/Users/youne/OneDrive/Desktop/UM6P-CS/CI/S4/Parall/tp2/ex3/ex3]
+
+        --------------------------------------------------------------------------------
+        -- Auto-annotated source: ex3.c
+        --------------------------------------------------------------------------------
+        Ir
+
+                .           #include <stdio.h>
+                .           #include <stdlib.h>
+                .
+                .           #define N 5000000
+                .
+                1 ( 0.00%)  void add_noise(double *a) {
+                5 ( 0.00%)      a[0] = 1.0;
+                .               // Strictly sequential: a[i] depends on a[i-1], so iterations cannot run in parallel.
+        14,999,997 (13.62%)      for (int i = 1; i < N; i++) {
+        9,999,998 ( 9.08%)          a[i] = a[i - 1] * 1.0000001;
+                .               }
+                1 ( 0.00%)  }
+                .
+                .           /*===== Initialization ===== */
+                .           void init_b(double *b) {
+        15,000,001 (13.62%)      for (int i = 0; i < N; i++) {
+        20,000,000 (18.16%)          b[i] = i * 0.5;
+                .               }
+                .           }
+                .
+                .           /*===== Compute addition===== */
+                3 ( 0.00%)  void compute_addition(double *a, double *b, double *c) {
+        15,000,000 (13.62%)      for (int i = 0; i < N; i++) {
+        15,000,000 (13.62%)          c[i] = a[i] + b[i];
+                .               }
+                1 ( 0.00%)  }
+                .
+                .           /*===== Reduction===== */
+                .           double reduction(double *c) {
+                2 ( 0.00%)      double sum = 0.0;
+        15,000,002 (13.62%)      for (int i = 0; i < N; i++) {
+        5,000,000 ( 4.54%)          sum += c[i];
+                .               }
+                .               return sum;
+                .           }
+                .
+                4 ( 0.00%)  int main() {
+                3 ( 0.00%)      double *a = malloc(N * sizeof(double));
+            1,909 ( 0.00%)  => ???:0x0000000000109080 (1x)
+                3 ( 0.00%)      double *b = malloc(N * sizeof(double));
+            292 ( 0.00%)  => ???:0x0000000000109080 (1x)
+                3 ( 0.00%)      double *c = malloc(N * sizeof(double));
+            292 ( 0.00%)  => ???:0x0000000000109080 (1x)
+                .
+                4 ( 0.00%)      add_noise(a);
+        25,000,002 (22.70%)  => ex3.c:add_noise (1x)
+                .               init_b(b);
+                4 ( 0.00%)      compute_addition(a, b, c);
+        30,000,004 (27.24%)  => ex3.c:compute_addition (1x)
+                .
+                .               double sum = reduction(c);
+                .               printf("Sum = %f\n", sum);
+                .
+                2 ( 0.00%)      free(a);
+                63 ( 0.00%)  => ???:0x0000000000109070 (1x)
+                2 ( 0.00%)      free(b);
+                63 ( 0.00%)  => ???:0x0000000000109070 (1x)
+                2 ( 0.00%)      free(c);
+                63 ( 0.00%)  => ???:0x0000000000109070 (1x)
+                .               return 0;
+                5 ( 0.00%)  }
+        --------------------------------------------------------------------------------
+        Ir
+        --------------------------------------------------------------------------------
+        110,000,043 (99.87%)  events annotated
+
+        Sequential instructions (add_noise): 25,000,002  
+        Total instructions: ~ 110,141,697  
+
+        Sequential fraction:  
+        fs = I_seq / I_total = 25,000,002 / 110,141,697 ≈ 0.227 = 23%
+
+        | p (cores) | Theoretical Speedup ( S(p) ) |
+        | --------- | ---------------------------- |
+        | 1         | 1.00                         |
+        | 2         | 1.63                         |
+        | 4         | 2.38                         |
+        | 8         | 3.09                         |
+        | 16        | 3.63                         |
+        | 32        | 3.98                         |
+        | 64        | 4.18                         |
+
+    For N=1e7:
+        oot@MyLen:/mnt/c/Users/youne/OneDrive/Desktop/UM6P-CS/CI/S4/Parall/tp2/ex3# valgrind --tool=callgrind ./ex3
+        ==3395== Callgrind, a call-graph generating cache profiler
+        ==3395== Copyright (C) 2002-2017, and GNU GPL'd, by Josef Weidendorfer et al.
+        ==3395== Using Valgrind-3.18.1 and LibVEX; rerun with -h for copyright info
+        ==3395== Command: ./ex3
+        ==3395== 
+        ==3395== For interactive control, run 'callgrind_control -h'.
+        Sum = 25000014682820.417969
+        ==3395== 
+        ==3395== Events    : Ir
+        ==3395== Collected : 220140656
+        ==3395==
+        ==3395== I   refs:      220,140,656
+        root@MyLen:/mnt/c/Users/youne/OneDrive/Desktop/UM6P-CS/CI/S4/Parall/tp2/ex3# callgrind_annotate callgrind.out.3395 
+        --------------------------------------------------------------------------------
+        Profile data file 'callgrind.out.3395' (creator: callgrind-3.18.1)        
+        --------------------------------------------------------------------------------
+        I1 cache:
+        D1 cache:
+        LL cache:
+        Timerange: Basic block 0 - 40028920
+        Trigger: Program termination
+        Profiled target:  ./ex3 (PID 3395, part 1)
+        Events recorded:  Ir
+        Events shown:     Ir
+        Event sort order: Ir
+        Thresholds:       99
+        Include dirs:
+        User annotated:
+        Auto-annotation:  on
+
+        --------------------------------------------------------------------------------
+        Ir
+        --------------------------------------------------------------------------------
+        220,140,656 (100.0%)  PROGRAM TOTALS
+
+        --------------------------------------------------------------------------------
+        Ir                    file:function
+        --------------------------------------------------------------------------------
+        110,000,037 (49.97%)  ex3.c:main [/mnt/c/Users/youne/OneDrive/Desktop/UM6P-CS/CI/S4/Parall/tp2/ex3/ex3]
+        60,000,004 (27.26%)  ex3.c:compute_addition [/mnt/c/Users/youne/OneDrive/Desktop/UM6P-CS/CI/S4/Parall/tp2/ex3/ex3]
+        50,000,002 (22.71%)  ex3.c:add_noise [/mnt/c/Users/youne/OneDrive/Desktop/UM6P-CS/CI/S4/Parall/tp2/ex3/ex3]
+
+        --------------------------------------------------------------------------------
+        -- Auto-annotated source: ex3.c
+        --------------------------------------------------------------------------------
+        Ir
+
+                .           #include <stdio.h>
+                .           #include <stdlib.h>
+                .
+                .           #define N 10000000
+                .
+                1 ( 0.00%)  void add_noise(double *a) {
+                5 ( 0.00%)      a[0] = 1.0;
+                .               // Strictly sequential: a[i] depends on a[i-1], so iterations cannot run in parallel.
+        29,999,997 (13.63%)      for (int i = 1; i < N; i++) {
+        19,999,998 ( 9.09%)          a[i] = a[i - 1] * 1.0000001;
+                .               }
+                1 ( 0.00%)  }
+                .
+                .           /*===== Initialization ===== */
+                .           void init_b(double *b) {
+        30,000,001 (13.63%)      for (int i = 0; i < N; i++) {
+        40,000,000 (18.17%)          b[i] = i * 0.5;
+                .               }
+                .           }
+                .
+                .           /*===== Compute addition===== */
+                3 ( 0.00%)  void compute_addition(double *a, double *b, double *c) {
+        30,000,000 (13.63%)      for (int i = 0; i < N; i++) {
+        30,000,000 (13.63%)          c[i] = a[i] + b[i];
+                .               }
+                1 ( 0.00%)  }
+                .
+                .           /*===== Reduction===== */
+                .           double reduction(double *c) {
+                2 ( 0.00%)      double sum = 0.0;
+        30,000,002 (13.63%)      for (int i = 0; i < N; i++) {
+        10,000,000 ( 4.54%)          sum += c[i];
+                .               }
+                .               return sum;
+                .           }
+                .
+                4 ( 0.00%)  int main() {
+                3 ( 0.00%)      double *a = malloc(N * sizeof(double));
+            1,909 ( 0.00%)  => ???:0x0000000000109080 (1x)
+                3 ( 0.00%)      double *b = malloc(N * sizeof(double));
+            292 ( 0.00%)  => ???:0x0000000000109080 (1x)
+                3 ( 0.00%)      double *c = malloc(N * sizeof(double));
+            292 ( 0.00%)  => ???:0x0000000000109080 (1x)
+                .
+                4 ( 0.00%)      add_noise(a);
+        50,000,002 (22.71%)  => ex3.c:add_noise (1x)
+                .               init_b(b);
+                4 ( 0.00%)      compute_addition(a, b, c);
+        60,000,004 (27.26%)  => ex3.c:compute_addition (1x)
+                .
+                .               double sum = reduction(c);
+                .               printf("Sum = %f\n", sum);
+                .
+                2 ( 0.00%)      free(a);
+                63 ( 0.00%)  => ???:0x0000000000109070 (1x)
+                2 ( 0.00%)      free(b);
+                63 ( 0.00%)  => ???:0x0000000000109070 (1x)
+                2 ( 0.00%)      free(c);
+                63 ( 0.00%)  => ???:0x0000000000109070 (1x)
+                .               return 0;
+                5 ( 0.00%)  }
+        --------------------------------------------------------------------------------
+        Ir
+        --------------------------------------------------------------------------------
+        220,000,043 (99.94%)  events annotated
+    Total Ir events = 220,140,656
+        Sequential instructions ≈ add_noise = 50,000,002
+
+    Sequential fraction:
+    fs = I_seq / I_total = 50,000,002 / 220,140,656 ≈ 0.227 = 23%
+    | p (cores) | Theoretical Speedup S(p) |
+    |-----------|-------------------------|
+    | 1         | 1.00                    |
+    | 2         | 1.63                    |
+    | 4         | 2.38                    |
+    | 8         | 3.09                    |
+    | 16        | 3.63                    |
+    | 32        | 3.98                    |
+    | 64        | 4.18                    |
+    For N=1e8 (already done)
+
+
+    Same fs over all vals of N.
+    \includegraphics{331.png}
+
+Question 5
+    1. 
+    Gustafson’s Law (weak scaling, problem size grows with p):
+
+    S_G(p) = p - fs × (p - 1)
+
+    Where:
+    - S_G(p) is the speedup with p processors,
+    - fs is the sequential fraction of the workload.
+
+    | p (cores) | Gustafson Speedup ( S_G(p) ) |
+    | --------- | ---------------------------- |
+    | 1         | 1.000                        |
+    | 2         | 1.773                        |
+    | 4         | 3.319                        |
+    | 8         | 6.411                        |
+    | 16        | 12.595                       |
+    | 32        | 24.963                       |
+    | 64        | 49.699                       |
+    2. 
+    Summary Table:
+
+    | Law         | Scaling Type | Speedup Growth         | Limiting Factor                | Practical Implication                  |
+    |-------------|-------------|------------------------|-------------------------------|----------------------------------------|
+    | Amdahl      | Strong      | Saturates quickly      | Sequential fraction (fs)      | Diminishing returns for large p        |
+    | Gustafson   | Weak        | Grows almost linearly  | Sequential fraction (fs)      | Efficient scaling with increasing load |
+    \includegraphics{332.png}
+    Graphically:
+    - Amdahl’s curve: steep rise, then plateau.
+    - Gustafson’s curve: nearly straight line, much higher speedup for large p.
+
+    Conclusion:
+    Amdahl’s Law shows the limits of parallelization for fixed workloads, while Gustafson’s Law demonstrates the potential for near-linear scaling when the workload grows with the number of processors.

@@ -1,0 +1,405 @@
+Questions 1,2.
+    Unroll Factor   Sum             Time (ms)
+    ===========================================
+    U =   1         1000000.000000  3.171000
+    U =   2         1000000.000000  2.204000
+    U =   3         1000000.000000  1.488000
+    U =   4         1000000.000000  1.327000
+    U =   5         1000000.000000  1.438000
+    U =   6         1000000.000000  1.216000
+    U =   7         1000000.000000  1.171000
+    U =   8         1000000.000000  1.078000
+    U =   9         1000000.000000  1.163000
+    U =  10         1000000.000000  1.249000
+    U =  11         1000000.000000  1.265000
+    U =  12         1000000.000000  1.278000
+    U =  13         1000000.000000  1.189000
+    U =  14         1000000.000000  1.285000
+    U =  15         1000000.000000  1.195000
+    U =  16         1000000.000000  1.190000
+    U =  17         1000000.000000  1.466000
+    U =  18         1000000.000000  1.801000
+    U =  19         1000000.000000  2.177000
+    U =  20         1000000.000000  1.328000
+    U =  21         1000000.000000  1.197000
+    U =  22         1000000.000000  2.966000
+    U =  23         1000000.000000  3.642000
+    U =  24         1000000.000000  1.424000
+    U =  25         1000000.000000  1.833000
+    U =  26         1000000.000000  2.554000
+    U =  27         1000000.000000  3.445000
+    U =  28         1000000.000000  3.487000
+    U =  29         1000000.000000  1.675000
+    U =  30         1000000.000000  1.358000
+    U =  31         1000000.000000  1.499000
+    U =  32         1000000.000000  1.790000
+Question 3.
+    Remark: at each run I do, I get new best U
+    For a run, Got BEST Unrolling U = 8
+Question 4. 
+    -O0:
+    Unroll Factor   Sum             Time (ms)
+    ===========================================
+    U =   1         1000000.000000  4.203000
+    U =   2         1000000.000000  2.344000
+    U =   3         1000000.000000  2.078000
+    U =   4         1000000.000000  6.106000
+    U =   5         1000000.000000  2.258000
+    U =   6         1000000.000000  2.272000
+    U =   7         1000000.000000  3.312000
+    U =   8         1000000.000000  2.730000
+    U =   9         1000000.000000  1.933000
+    U =  10         1000000.000000  1.216000
+    U =  11         1000000.000000  1.620000
+    U =  12         1000000.000000  1.292000
+    U =  13         1000000.000000  1.229000
+    U =  14         1000000.000000  1.242000
+    U =  15         1000000.000000  1.912000
+    U =  16         1000000.000000  1.930000
+    U =  17         1000000.000000  2.304000
+    U =  18         1000000.000000  3.770000
+    U =  19         1000000.000000  3.373000
+    U =  20         1000000.000000  1.628000
+    U =  21         1000000.000000  1.683000
+    U =  22         1000000.000000  1.441000
+    U =  23         1000000.000000  1.797000
+    U =  24         1000000.000000  1.889000
+    U =  25         1000000.000000  5.506000
+    U =  26         1000000.000000  2.534000
+    U =  27         1000000.000000  2.691000
+    U =  28         1000000.000000  1.974000
+    U =  29         1000000.000000  2.212000
+    U =  30         1000000.000000  4.868000
+    U =  31         1000000.000000  2.755000
+    U =  32         1000000.000000  2.663000
+    Best U=10
+    -O2:
+    Unroll Factor   Sum             Time (ms)
+    ===========================================
+    U =   1         1000000.000000  2.104000
+    U =   2         1000000.000000  1.543000
+    U =   3         1000000.000000  0.908000
+    U =   4         1000000.000000  0.801000
+    U =   5         1000000.000000  0.679000
+    U =   6         1000000.000000  0.654000
+    U =   7         1000000.000000  0.807000
+    U =   8         1000000.000000  0.941000
+    U =   9         1000000.000000  1.006000
+    U =  10         1000000.000000  0.907000
+    U =  11         1000000.000000  2.851000
+    U =  12         1000000.000000  4.322000
+    U =  13         1000000.000000  2.064000
+    U =  14         1000000.000000  1.490000
+    U =  15         1000000.000000  2.576000
+    U =  16         1000000.000000  1.211000
+    U =  17         1000000.000000  1.860000
+    U =  18         1000000.000000  1.162000
+    U =  19         1000000.000000  0.908000
+    U =  20         1000000.000000  0.983000
+    U =  21         1000000.000000  1.163000
+    U =  22         1000000.000000  0.966000
+    U =  23         1000000.000000  0.982000
+    U =  24         1000000.000000  1.001000
+    U =  25         1000000.000000  1.012000
+    U =  26         1000000.000000  0.970000
+    U =  27         1000000.000000  0.944000
+    U =  28         1000000.000000  0.856000
+    U =  29         1000000.000000  0.657000
+    U =  30         1000000.000000  0.655000
+    U =  31         1000000.000000  1.096000
+    U =  32         1000000.000000  1.955000
+    Best U=6 
+Question 5. Analysis: Manual Unrolling vs Compiler Optimization (-O2)
+
+    Comparison of Results:
+    ======================
+
+    No Optimization (-O0):
+    - Best performance: U=10 with 1.216ms
+    - Manual unrolling provides significant benefit (65-71% improvement over U=1)
+    - Clear performance gains from U=1 to U=10
+
+    With -O2 Optimization:
+    - Best performance: U=6 with 0.654ms, U=30 with 0.655ms, U=29 with 0.657ms
+    - Manual unrolling still provides benefit (69% improvement over U=1)
+    - Compiler already optimizes significantly (U=1 is 2.104ms vs 4.203ms without -O2)
+
+
+    CONCLUSION:
+    ===========
+    Manual unrolling remains beneficial even with -O2, but:
+    - Lower unroll factors (U=6) are optimal with compiler optimization
+    - The compiler doesn't fully replace manual unrolling for this workload
+    - Combined approach (moderate manual unrolling + compiler optimization) gives best results
+Question 6.
+    6.1 Float
+    Unroll Factor   Sum             Time (ms)
+    ===========================================
+    U =  1          1000000.000000          3.058000
+    U =  2          1000000.000000          2.136000
+    U =  3          1000000.000000          1.687000
+    U =  4          1000000.000000          1.287000
+    U =  5          1000000.000000          1.215000
+    U =  6          1000000.000000          1.161000
+    U =  7          1000000.000000          1.190000
+    U =  8          1000000.000000          2.056000
+    U =  9          1000000.000000          1.672000
+    U = 10          1000000.000000          1.018000
+    U = 11          1000000.000000          0.941000
+    U = 12          1000000.000000          1.252000
+    U = 13          1000000.000000          2.124000
+    U = 14          1000000.000000          2.115000
+    U = 15          1000000.000000          2.707000
+    U = 16          1000000.000000          2.078000
+    U = 17          1000000.000000          2.373000
+    U = 18          1000000.000000          2.180000
+    U = 19          1000000.000000          3.201000
+    U = 20          1000000.000000          1.445000
+    U = 21          1000000.000000          1.102000
+    U = 22          1000000.000000          1.328000
+    U = 23          1000000.000000          1.384000
+    U = 24          1000000.000000          1.521000
+    U = 25          1000000.000000          1.321000
+    U = 26          1000000.000000          1.662000
+    U = 27          1000000.000000          3.408000
+    U = 28          1000000.000000          2.530000
+    U = 29          1000000.000000          1.542000
+    U = 30          1000000.000000          1.551000
+    U = 31          1000000.000000          1.872000
+    U = 32          1000000.000000          1.823000
+    Best U=11
+    6.2 Int
+    Unroll Factor   Sum             Time (ms)
+    ===========================================
+    U =  1          1000000         2.611000
+    U =  2          1000000         1.579000
+    U =  3          1000000         1.337000
+    U =  4          1000000         1.212000
+    U =  5          1000000         1.266000
+    U =  6          1000000         1.419000
+    U =  7          1000000         0.988000
+    U =  8          1000000         0.981000
+    U =  9          1000000         0.854000
+    U = 10          1000000         0.935000
+    U = 11          1000000         0.945000
+    U = 12          1000000         1.061000
+    U = 13          1000000         1.476000
+    U = 14          1000000         2.026000
+    U = 15          1000000         1.018000
+    U = 16          1000000         0.839000
+    U = 17          1000000         1.074000
+    U = 18          1000000         1.058000
+    U = 19          1000000         1.041000
+    U = 20          1000000         1.323000
+    U = 21          1000000         1.763000
+    U = 22          1000000         0.954000
+    U = 23          1000000         0.947000
+    U = 24          1000000         1.003000
+    U = 25          1000000         1.047000
+    U = 26          1000000         1.835000
+    U = 27          1000000         2.410000
+    U = 28          1000000         1.356000
+    U = 29          1000000         1.129000
+    U = 30          1000000         1.178000
+    U = 31          1000000         1.148000
+    U = 32          1000000         1.517000
+    Best U =16
+    6.2 Short
+    Reduced N=1e4 to prevent overflow:
+    Unroll Factor   Sum             Time (ms)
+    ===========================================
+    U =  1          10000           0.021000000000000
+    U =  2          10000           0.014000000000000
+    U =  3          10000           0.010000000000000
+    U =  4          10000           0.067000000000000
+    U =  5          10000           0.011000000000000
+    U =  6          10000           0.029000000000000
+    U =  7          10000           0.013000000000000
+    U =  8          10000           0.013000000000000
+    U =  9          10000           0.034000000000000
+    U = 10          10000           0.012000000000000
+    U = 11          10000           0.015000000000000
+    U = 12          10000           0.011000000000000
+    U = 13          10000           0.014000000000000
+    U = 14          10000           0.008000000000000
+    U = 15          10000           0.008000000000000
+    U = 16          10000           0.014000000000000
+    U = 17          10000           0.037000000000000
+    U = 18          10000           0.034000000000000
+    U = 19          10000           0.012000000000000
+    U = 20          10000           0.012000000000000
+    U = 21          10000           0.036000000000000
+    U = 22          10000           0.012000000000000
+    U = 23          10000           0.013000000000000
+    U = 24          10000           0.013000000000000
+    U = 25          10000           0.013000000000000
+    U = 26          10000           0.013000000000000
+    U = 27          10000           0.027000000000000
+    U = 28          10000           0.011000000000000
+    U = 29          10000           0.032000000000000
+    U = 30          10000           0.011000000000000
+    U = 31          10000           0.112000000000000
+    U = 32          10000           0.010000000000000
+
+    Best U =14,15
+
+Question 7. Theoretical Lower Bound Analysis: Memory Bandwidth Limitation
+
+    Formula: Tmin ≈ (N × sizeof(type)) / BW
+
+    Assumptions and Calculations:
+    ============================
+
+    Given:
+    - N = 1,000,000 elements
+    - Typical modern system memory bandwidth: BW ≈ 25-50 GB/s
+    - Conservative estimate: BW = 30 GB/s = 30,000 MB/s
+
+    Data Type Analysis:
+    ==================
+
+    7.1 Double (8 bytes):
+    - Data size = 1,000,000 × 8 bytes = 8 MB
+    - Theoretical Tmin = 8 MB / 30,000 MB/s = 0.267 ms
+    - Best measured time: ~1.078 ms (U=8)
+    - Ratio: 1.078 / 0.267 = 4.04x overhead
+
+    7.2 Float (4 bytes):
+    - Data size = 1,000,000 × 4 bytes = 4 MB  
+    - Theoretical Tmin = 4 MB / 30,000 MB/s = 0.133 ms
+    - Best measured time: ~0.94 ms (U=11)
+    - Ratio: 0.94 / 0.133 = 7.07x overhead
+
+    7.3 Int (4 bytes):
+    - Data size = 1,000,000 × 4 bytes = 4 MB
+    - Theoretical Tmin = 4 MB / 30,000 MB/s = 0.133 ms
+    - Best measured time: ~0.84 ms (U=16)
+    - Ratio: 0.84 / 0.133 = 6.32x overhead
+
+    7.4 Short (2 bytes, N=10,000):
+    - Data size = 10,000 × 2 bytes = 20 KB
+    - Theoretical Tmin = 0.02 MB / 30,000 MB/s = 0.0007 ms
+    - Best measured time: ~0.008 ms (U=14,15)
+    - Ratio: 0.008 / 0.0007 = 11.4x overhead
+
+    Analysis and Comments:
+    =====================
+
+    1. MEMORY BANDWIDTH IS NOT THE BOTTLENECK:
+    - All measured times are significantly higher than theoretical minimum
+    - Indicates compute-bound rather than memory-bound operation
+
+    2. OVERHEAD SOURCES:
+    - Loop control overhead (branching, increment, comparison)
+    - CPU pipeline effects and instruction dependencies
+    - Cache misses and memory latency (not just bandwidth)
+    - Arithmetic operations (addition) processing time
+
+    3. DATA TYPE PERFORMANCE RANKING:
+    - Double: Moderate efficiency (4.04x overhead) 
+    - Int: Good efficiency (6.32x overhead)
+    - Float: Moderate efficiency (7.07x overhead)
+    - Short: Worst efficiency (11.4x overhead) - small dataset, timing precision issues
+
+    4. KEY INSIGHTS:
+    - Memory bandwidth alone doesn't determine performance
+    - CPU computational overhead dominates for this simple operation
+    - Compiler optimizations significantly impact the compute/memory ratio
+    - Loop unrolling reduces computational overhead, not memory bandwidth usage
+
+    CONCLUSION:
+    ===========
+    The theoretical memory bandwidth limit provides a lower bound, but actual 
+    performance is limited by:
+    - CPU instruction processing overhead
+    - Memory latency (not bandwidth)
+    - Loop control structures
+    - Data type processing efficiency
+
+    For this workload, optimizing computational overhead (via unrolling) is more 
+    important than memory bandwidth optimization.
+
+Question 8. Why Performance Improves Then Saturates with Increasing U
+
+    Performance Curve Analysis:
+    ==========================
+
+    PHASE 1: Initial Performance Improvement (U=1 to U=8-16)
+    ========================================================
+
+    Why increasing U improves performance at first:
+
+    1. REDUCED LOOP OVERHEAD:
+    - Fewer loop iterations: N/U instead of N iterations
+    - Less frequent branch instructions and condition checking
+    - Reduced loop counter increment/decrement operations
+    - Example: U=8 reduces 1,000,000 iterations to 125,000 iterations
+
+    2. INCREASED INSTRUCTION-LEVEL PARALLELISM (ILP):
+    - Multiple independent additions per iteration: sum += a[i] + a[i+1] + ... + a[i+U-1]
+    - CPU can execute multiple additions simultaneously using superscalar execution
+    - Better utilization of CPU execution units (ALUs)
+    - Reduces instruction dependencies and pipeline stalls
+
+    3. IMPROVED CPU PIPELINE EFFICIENCY:
+    - Fewer pipeline flushes due to branch mispredictions
+    - Better instruction throughput with straight-line code
+    - More efficient instruction fetch and decode
+
+    Evidence from our data:
+    - Double: 3.17ms (U=1) → 1.08ms (U=8) = 66% improvement
+    - Int: 2.61ms (U=1) → 0.84ms (U=16) = 68% improvement
+
+    PHASE 2: Performance Saturation/Degradation (U>16-20)
+    =====================================================
+
+    Why performance saturates or degrades with very high U:
+
+    1. BANDWIDTH LIMITATION APPROACHES:
+    - Memory bandwidth becomes the limiting factor
+    - CPU can process data faster than memory can supply it
+    - Further loop unrolling doesn't help if memory is the bottleneck
+
+    2. INSTRUCTION CACHE PRESSURE:
+    - Large unrolled loops increase code size significantly
+    - May exceed L1 instruction cache capacity
+    - Cache misses slow down instruction fetch
+
+    3. REGISTER PRESSURE:
+    - High unroll factors may require more temporary variables
+    - CPU has limited number of registers
+    - Register spilling to memory reduces performance
+
+    4. DIMINISHING RETURNS FROM ILP:
+    - CPU execution units become fully utilized
+    - Additional parallel instructions don't provide benefit
+    - Memory latency becomes dominant factor
+
+    Evidence from our data:
+    - Double: Performance becomes erratic after U=16 (1.19ms → 3.49ms at U=28)
+    - Int: Optimal around U=16 (0.84ms), then increases to 1.52ms at U=32
+    - Float: Best at U=11 (0.94ms), degrades significantly at higher U
+
+    THEORETICAL BANDWIDTH LIMIT EXPLANATION:
+    =======================================
+
+    As U increases and computational overhead decreases, the operation transitions from:
+    - COMPUTE-BOUND (low U): CPU processing time dominates
+    - MEMORY-BOUND (high U): Memory bandwidth becomes the limiting factor
+
+    At the bandwidth limit:
+    - Further unrolling cannot improve performance
+    - Execution time approaches Tmin ≈ (N × sizeof(type)) / BW
+    - This explains why our measured times (0.65-1.08ms) are several times higher than theoretical minimum (0.13-0.27ms)
+
+    OPTIMAL UNROLL FACTOR:
+    ======================
+
+    The optimal U balances:
+    - Sufficient loop overhead reduction
+    - Maximum ILP utilization
+    - Avoiding bandwidth saturation
+    - Minimizing cache pressure
+
+    From our results: Optimal U typically ranges from 6-16 depending on data type and compiler optimization level.
+

@@ -1,0 +1,464 @@
+\documentclass[11pt, a4paper]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{enumitem}
+
+% --- Enhanced Styling ---
+\usepackage{mathpazo}      % Palatino font
+\usepackage[T1]{fontenc}
+\usepackage{microtype}     % Better typography
+\usepackage{xcolor}        % Colors for headings
+\usepackage{booktabs}      % Professional tables (toprule, midrule, bottomrule)
+\usepackage{caption}       % Better caption styling
+\usepackage{titlesec}      % Custom section titles
+\usepackage{fancyhdr}      % Custom headers/footers
+\usepackage{hyperref}      % Hyperlinks
+
+% Design Configuration
+\definecolor{primaryColor}{RGB}{0, 51, 102} % Navy Blue
+\definecolor{secondaryColor}{RGB}{80, 80, 80} % Dark Gray
+
+\hypersetup{
+    colorlinks=true,
+    linkcolor=primaryColor,
+    urlcolor=primaryColor,
+    pdftitle={TP2 Report},
+    pdfauthor={Youness Anouar}
+}
+
+% Header and Footer
+\pagestyle{fancy}
+\fancyhf{}
+\lhead{\small \textsc{Parallel Computing}}
+\rhead{\small \textsc{TP2 Report}}
+\cfoot{\thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+
+% Section Styling
+\titleformat{\section}
+{\color{primaryColor}\normalfont\Large\bfseries}
+{\thesection}{1em}{}
+\titleformat{\subsection}
+{\color{primaryColor!80}\normalfont\large\bfseries}
+{\thesubsection}{1em}{}
+
+% Caption Styling
+\captionsetup{font=small, labelfont={bf,color=primaryColor}}
+
+\title{\color{primaryColor}\textbf{\huge TP2}}
+\author{\textbf{Youness Anouar}}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+\thispagestyle{empty}
+\hrule
+\tableofcontents
+\vspace{1em}
+\hrule
+\newpage
+\section{Exercise 1}
+
+\subsection{Questions 1--2: Manual Unrolling Baseline}
+
+We sum an array of $N=10^6$ doubles using a manual unroll factor $U\in[1,32]$. The execution time $T(U)$ is shown in
+Fig.~\ref{fig:baseline}.
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=.8\linewidth]{11.png}
+  \caption{Manual unrolling with doubles}
+  \label{fig:baseline}
+\end{figure}
+
+Observation:
+\begin{itemize}[nosep]
+  \item Time drops quickly when going from $U=1$ to medium $U$.
+  \item Best run in the shown experiment: around $U=8$--$10$
+    ($\approx 1.1$\,ms vs.\ 3.2\,ms for $U=1$).
+  \item Very large $U$ makes performance noisy and sometimes worse.
+\end{itemize}
+
+\subsection{Question 3: Best Unroll Factor Stability}
+
+Across multiple runs the best $U$ is not fixed; typical best values are in
+$[6,10]$ (e.g., $U=8$ in one run). Small timing noise and interactions with
+caches, branch prediction, and OS scheduling explain why the exact optimum
+moves, but the ``good region'' is stable.
+
+\subsection{Questions 4--5: Manual Unrolling vs.\ \texttt{-O2}}
+
+We now compare \texttt{-O0} and \texttt{-O2} while still manually unrolling.
+Results are summarized in Fig.~\ref{fig:O0O2}.
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=.9\linewidth]{12.png}
+  \caption{Manual unrolling at \texttt{-O0} vs.\ \texttt{-O2}.}
+  \label{fig:O0O2}
+\end{figure}
+
+Key points:
+\begin{itemize}[nosep]
+  \item \textbf{\texttt{-O0}}: best time $\approx 1.22$\,ms at $U=10$
+    (about 65--70\% faster than $U=1$).
+  \item \textbf{\texttt{-O2}}: best time $\approx 0.65$\,ms at $U=6$
+    (also $\approx 70\%$ faster than $U=1$ at \texttt{-O2}).
+  \item Even with \texttt{-O2}, manual unrolling helps: the compiler does not
+    fully remove loop overhead for this kernel.
+  \item The best $U$ with \texttt{-O2} is smaller (around 6) than with
+    \texttt{-O0}, because the compiler already performs part of the work
+    (strength reduction, instruction scheduling, partial unrolling).
+\end{itemize}
+
+Conclusion for Q5:
+\begin{itemize}[nosep]
+  \item Manual unrolling is clearly beneficial at \texttt{-O0}.
+  \item With \texttt{-O2}, a moderate unroll factor plus compiler
+        optimizations gives the best performance.
+  \item The compiler alone does not completely replace manual unrolling here.
+\end{itemize}
+
+\subsection{Question 6: Effect of Data Type}
+
+We repeat the experiment with \texttt{float}, \texttt{int}, and \texttt{short}
+(Fig.~\ref{fig:types}). For \texttt{short} we use $N=10^4$ to avoid overflow.
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=.9\linewidth]{13.png}
+  \caption{Manual unrolling for \texttt{float}, \texttt{int}, and \texttt{short}.}
+  \label{fig:types}
+\end{figure}
+
+Observations:
+\begin{itemize}[nosep]
+  \item \textbf{Float}: best around $U=11$ ($\approx 0.94$\,ms).
+  \item \textbf{Int}: best around $U=16$ ($\approx 0.84$\,ms).
+  \item \textbf{Short} ($N=10^4$): best around $U=14$--$15$
+        ($\approx 0.008$\,ms), but timings are very small and noisy.
+  \item Optimal $U$ depends on type; heavier types (double/float) hit
+        compute and bandwidth limits earlier than \texttt{int}/\texttt{short}.
+\end{itemize}
+
+\subsection{Question 7: Theoretical Lower Bound (Bandwidth)}
+
+We approximate a lower bound assuming the kernel is purely memory-bandwidth
+limited:
+\[\
+  T_{\min} \approx \frac{N \times \text{sizeof(type)}}{\text{BW}},
+\]
+with $N=10^6$ (except \texttt{short}: $N=10^4$) and BW $\approx 30$\,GB/s.
+
+\begin{itemize}[nosep]
+  \item \textbf{Double} (8\,B): $8$\,MB $\Rightarrow T_{\min}\approx 0.27$\,ms.\\
+        Best measured $\approx 1.08$\,ms ($\sim 4\times$ slower).
+  \item \textbf{Float} (4\,B): $4$\,MB $\Rightarrow T_{\min}\approx 0.13$\,ms.\\
+        Best measured $\approx 0.94$\,ms ($\sim 7\times$ slower).
+  \item \textbf{Int} (4\,B): same bound, best $\approx 0.84$\,ms
+        ($\sim 6\times$ slower).
+  \item \textbf{Short} ($N=10^4$, 2\,B): 20\,KB
+        $\Rightarrow T_{\min}\approx 0.0007$\,ms.\\
+        Best measured $\approx 0.008$\,ms ($\sim 11\times$ slower) and dominated
+        by timer overhead.
+\end{itemize}
+
+Interpretation:
+\begin{itemize}[nosep]
+  \item All measured times are well above the bandwidth bound:
+        the kernel is not purely memory-bandwidth limited.
+  \item Main overheads: loop control, instruction dependencies, pipeline
+        effects, memory latency, and timer resolution for tiny runtimes.
+  \item Loop unrolling reduces \emph{computational} overhead but does not
+        change the bandwidth limit.
+\end{itemize}
+
+\subsection{Question 8: Why Performance Improves Then Saturates}
+
+Trend of $T(U)$:
+\begin{itemize}[nosep]
+  \item For small $U$ (e.g., $1 \le U \le 8$--$16$):
+    \begin{itemize}[nosep]
+      \item Fewer loop iterations ($N/U$ instead of $N$) $\Rightarrow$
+            less branch and counter overhead.
+      \item More independent operations per iteration $\Rightarrow$
+            better instruction-level parallelism and pipeline usage.
+      \item Result: strong speedup when increasing $U$ from 1.
+    \end{itemize}
+  \item For large $U$:
+    \begin{itemize}[nosep]
+      \item Loop body becomes large $\Rightarrow$ more I-cache pressure
+            and register pressure (spills).
+      \item Execution units and memory system approach saturation; further ILP
+            does not help.
+      \item Small perturbations (cache effects, branch prediction, OS noise)
+            make timings noisy; performance can degrade.
+    \end{itemize}
+\end{itemize}
+
+Overall, the kernel transitions from compute-bound at low $U$ to close to a
+memory/latency bound at high $U$. The best performance is obtained with a
+moderate unroll factor (roughly $6 \le U \le 16$ depending on type
+and optimization level).
+
+\section{Exercise 2}
+\subsection{Question 1: Performance at \texttt{-O0} vs.\ \texttt{-O2}}
+
+Measured results:
+\begin{itemize}[nosep]
+    \item \texttt{-O2}: $x = 131999999.662353$, $y = 131999999.662353$, time $= 0.107$\,s
+    \item \texttt{-O0}: $x = 131999999.662353$, $y = 131999999.662353$, time $= 0.271$\,s
+\end{itemize}
+
+\subsection{Question 2: Analysis of Compiler Optimizations}
+
+At \texttt{-O0}, each iteration performs two floating-point multiplications and frequent loads/stores from the stack for $a$, $b$, $x$, and $y$, with less efficient loop control.
+
+At \texttt{-O2}, the compiler:
+\begin{itemize}[nosep]
+    \item Hoists the product $a \times b$ out of the loop (loop-invariant code motion), storing it in a register.
+    \item Uses a single accumulator in an XMM register, minimizing memory traffic.
+    \item Holds the loop counter in a register and uses efficient branch instructions, improving instruction scheduling and instruction-level parallelism.
+\end{itemize}
+
+\subsection{Question 3: Manual Optimization vs.\ Compiler Optimization}
+
+Manually optimized (\texttt{-O0}, with $a \times b$ hoisted):
+\begin{itemize}[nosep]
+    \item $x = 131999999.662353$, $y = 131999999.662353$, time $= 0.265$\,s
+\end{itemize}
+
+Comparison:
+\begin{itemize}[nosep]
+    \item Original \texttt{-O0}: $0.271$\,s (slowest)
+    \item Manual optimization: $0.265$\,s (improved)
+    \item \texttt{-O2}: $0.107$\,s (fastest)
+\end{itemize}
+
+\textbf{Conclusion:} Manual optimization at \texttt{-O0} improves performance over the naive version, but is still much slower than the compiler-optimized \texttt{-O2} version. Modern compilers apply more aggressive and effective low-level optimizations than are practical to do by hand; thus, writing simple code and enabling \texttt{-O2} usually yields the best performance.
+
+\section{Exercise 3}
+
+\subsection{Question 1: Code Analysis}
+
+\begin{itemize}[nosep]
+    \item \textbf{Strictly Sequential Parts}: The loop in \texttt{add\_noise} is strictly sequential because each iteration depends on the previous one ($a[i]$ uses $a[i-1]$). The loop in \texttt{reduction} accumulates a sum; while the provided implementation is sequential, it can be parallelized using a tree-based reduction, so it is not inherently strictly sequential in the same way as \texttt{add\_noise}.
+    \item \textbf{Parallelizable Parts}:
+    \begin{itemize}[nosep]
+        \item \texttt{init\_b}: each $b[i]$ is independent.
+        \item \texttt{compute\_addition}: each $c[i]$ depends only on corresponding $a$ and $b$ indices.
+        \item \texttt{reduction}: amenable to parallel reduction strategies.
+    \end{itemize}
+    \item \textbf{Complexity}: All main functions (\texttt{add\_noise}, \texttt{init\_b}, \texttt{compute\_addition}, \texttt{reduction}) have $\Theta(N)$ time complexity.
+\end{itemize}
+
+\subsection{Question 2: Profiling with Callgrind}
+
+We profiled the application ($N=10^8$) using Valgrind/Callgrind. The instruction counts (Ir) summary is:
+\begin{itemize}[nosep]
+    \item \textbf{Total Program}: $\approx 2.2 \times 10^9$ instructions.
+    \item \texttt{main}: $\approx 1.1 \times 10^9$ (50\%).
+    \item \texttt{compute\_addition}: $\approx 6.0 \times 10^8$ (27.27\%).
+    \item \texttt{add\_noise}: $\approx 5.0 \times 10^8$ (22.73\%).
+\end{itemize}
+
+The strictly sequential fraction ($f_s$) corresponds to \texttt{add\_noise}:
+\[\
+    f_s = \frac{\text{Ir}_{\text{seq}}}{\text{Ir}_{\text{total}}} = \frac{500,000,002}{2,200,140,720} \approx 0.227 \quad (22.7\%).
+\]
+
+\subsection{Question 3: Amdahl's Law Prediction}
+
+Using Amdahl's Law $S(p) = \frac{1}{f_s + \frac{1-f_s}{p}}$ with $f_s \approx 0.23$:
+
+\begin{center}
+\begin{tabular}{cc}
+\toprule
+\textbf{Cores ($p$)} & \textbf{Theoretical Speedup $S(p)$} \\
+\midrule
+1 & 1.00 \\
+2 & 1.63 \\
+4 & 2.38 \\
+8 & 3.09 \\
+16 & 3.63 \\
+32 & 3.98 \\
+64 & 4.18 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+As $p \to \infty$, the maximum speedup is bounded by $1/f_s \approx 4.35$.
+
+\subsection{Question 4: Consistency Across Problem Sizes}
+
+We repeated the profiling for $N=5 \times 10^6$ and $N=10^7$. In both cases, the calculated sequential fraction remained $f_s \approx 0.227$.
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=.8\linewidth]{331.png}
+  \caption{Theoretical Speedup vs Number of Processors (Amdahl's Law).}
+  \label{fig:amdahl}
+\end{figure}
+
+The speedup saturates quickly due to the fixed sequential overhead.
+
+\subsection{Question 5: Gustafson's Law}
+
+Gustafson's Law (weak scaling) assumes the problem size grows with $p$:
+\[ S_G(p) = p - f_s \times (p - 1) \]
+
+\begin{center}
+\begin{tabular}{cc}
+\toprule
+\textbf{Cores ($p$)} & \textbf{Gustafson Speedup $S_G(p)$} \\
+\midrule
+1 & 1.000 \\
+2 & 1.773 \\
+4 & 3.319 \\
+8 & 6.411 \\
+16 & 12.595 \\
+32 & 24.963 \\
+64 & 49.699 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{table}[h]
+\centering
+\caption{Comparison of Scaling Laws}
+\begin{tabular}{lll}
+\toprule
+\textbf{Law} & \textbf{Scaling} & \textbf{Growth Behavior} \\
+\midrule
+Amdahl & Strong & Saturates quickly (limited by $f_s$) \\
+Gustafson & Weak & Grows almost linearly \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=.8\linewidth]{332.png}
+  \caption{Amdahl vs Gustafson Speedup.}
+  \label{fig:amdahl_vs_gustafson}
+\end{figure}
+
+\textbf{Conclusion}: Amdahl's Law shows the limits of parallelization for fixed workloads, while Gustafson's Law highlights the potential for near-linear scaling when the workload increases proportional to the processor count.
+
+\section{Exercise 4}
+
+\subsection{Question 1: Profiling Analysis (N=512)}
+
+We profiled a matrix multiplication application ($N=512$) using Valgrind/Callgrind. The instruction counts summary is:
+\begin{itemize}[nosep]
+    \item \textbf{Total Program}: $948,847,389$ instructions.
+    \item \texttt{matmul}: $941,888,011$ (99.27\%).
+    \item \texttt{init\_matrix} ($2\times$): $6,815,754$ (0.72\%).
+    \item \texttt{generate\_noise}: $2,562$ ($\approx 0.00\%$).
+\end{itemize}
+
+Within \texttt{matmul}, the innermost \texttt{k} loop accounts for approximately 99.05\% of the total instructions, indicating that almost all computation time is spent in the matrix multiplication kernel.
+
+\textbf{Parallelizability Analysis:}
+\begin{itemize}[nosep]
+    \item The outer loops over \texttt{i} and \texttt{j} in \texttt{matmul} are fully parallelizable, as each $(i,j)$ computation is independent.
+    \item The inner \texttt{k} loop is a reduction (sum), which is sequential per $(i,j)$ element but can be computed in parallel for different elements.
+    \item \texttt{init\_matrix} is fully parallelizable (each element independent).
+    \item \texttt{generate\_noise} is strictly sequential due to loop-carried dependency: \texttt{noise[i] = noise[i-1] * 1.0000001}.
+\end{itemize}
+
+The sequential fraction corresponds only to \texttt{generate\_noise}:
+\[\
+    f_s = \frac{2,562}{948,847,389} \approx 0.00027\% \quad \Rightarrow \quad f_s \approx 0.003
+\]
+
+This means the code is highly amenable to parallelization, with nearly all computation being parallel.
+
+\subsection{Question 2: Amdahl's Law -- Strong Scaling (N=512)}
+
+Using Amdahl's Law for strong scaling with $f_s \approx 0.003$:
+\[\
+    S(p) = \frac{1}{f_s + \frac{1-f_s}{p}}
+\]
+
+The theoretical maximum speedup as $p \to \infty$ is $1/f_s \approx 333\times$.
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=.8\linewidth]{41.png}
+  \caption{Amdahl's Law speedup vs.\ number of processors (N=512).}
+  \label{fig:amdahl512}
+\end{figure}
+
+The code achieves near-linear speedup for a large number of processors, limited only by the small sequential fraction.
+
+\subsection{Question 3: Gustafson's Law -- Weak Scaling (N=512)}
+
+Using Gustafson's Law for weak scaling:
+\[\
+    S_G(p) = p - f_s \times (p - 1)
+\]
+
+With $f_s \approx 0.003$, Gustafson's Law predicts nearly perfect linear scaling.
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=.8\linewidth]{42.png}
+  \caption{Amdahl vs.\ Gustafson speedup comparison (N=512).}
+  \label{fig:amdahl_gustafson512}
+\end{figure}
+
+\subsection{Question 4: Consistency Analysis (N=128)}
+
+We repeated the profiling for $N=128$. The instruction counts summary is:
+\begin{itemize}[nosep]
+    \item \textbf{Total Program}: $15,396,011$ instructions.
+    \item \texttt{matmul}: $14,828,683$ (96.32\%).
+    \item \texttt{init\_matrix} ($2\times$): $425,994$ (2.77\%).
+    \item \texttt{generate\_noise}: $642$ ($\approx 0.004\%$).
+\end{itemize}
+
+Sequential fraction (only \texttt{generate\_noise}):
+\[\
+    f_s = \frac{642}{15,255,319} \approx 0.000042 \quad (0.0042\%)
+\]
+
+Maximum Amdahl speedup: $1/f_s \approx 23,809\times$.
+\newpage
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=.8\linewidth]{43.png}
+  \caption{Amdahl vs.\ Gustafson speedup comparison (N=128).}
+  \label{fig:amdahl_gustafson128}
+\end{figure}
+
+\subsection{Comparison: Exercise 3 vs.\ Exercise 4}
+
+\begin{center}
+\begin{tabular}{lcc}
+\toprule
+\textbf{Metric} & \textbf{Exercise 3} & \textbf{Exercise 4 (N=512)} \\
+\midrule
+Sequential function & \texttt{add\_noise} & \texttt{generate\_noise} \\
+Sequential fraction $f_s$ & 22.7\% & 0.0003\% \\
+Parallel fraction & 77.3\% & 99.9997\% \\
+Max Amdahl speedup ($1/f_s$) & $\approx 4.35\times$ & $\approx 333,333\times$ \\
+Scaling at 64 cores (Amdahl) & $4.18\times$ & $\approx 64\times$ \\
+Scaling at 64 cores (Gustafson) & $49.7\times$ & $\approx 64\times$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\textbf{Key Observations:}
+\begin{itemize}[nosep]
+    \item \textbf{Sequential fraction impact}: Exercise 3 has a significant sequential portion (22.7\%), severely limiting speedup under Amdahl's Law. Exercise 4's sequential fraction is negligible ($<0.001\%$), allowing near-linear scaling.
+    \item \textbf{Complexity differences}: In Exercise 3, all functions scale as $O(N)$, so the sequential fraction remains constant regardless of problem size. In Exercise 4, \texttt{matmul} scales as $O(N^3)$ while \texttt{generate\_noise} scales as $O(N)$, causing the sequential fraction to \emph{decrease} as $N$ grows.
+    \item \textbf{Amdahl vs.\ Gustafson}: For Exercise 3, Gustafson's Law provides much better scaling predictions than Amdahl's Law due to the large $f_s$. For Exercise 4, both laws predict nearly identical (linear) scaling because $f_s \approx 0$.
+    \item \textbf{Practical implications}: Exercise 3 represents a poorly parallelizable workload where weak scaling is essential for good performance. Exercise 4 represents an ideal parallelizable workload where strong scaling is achievable.
+\end{itemize}
+
+\textbf{Conclusion}: The sequential fraction $f_s$ is the critical factor determining parallel scalability. Algorithms with $O(N^k)$ parallel work and $O(N)$ sequential overhead (like matrix multiplication with $k=3$) become increasingly parallelizable as problem size grows, while algorithms where all components scale equally (like Exercise 3) maintain a fixed scalability limit.
+
+\end{document}
