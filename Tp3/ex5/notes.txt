@@ -1,0 +1,38 @@
+root@MyLen:/mnt/c/Users/youne/OneDrive/Desktop/UM6P-CS/CI/S4/Parall/TPs/Tp3/ex5# for t in 1 2 4 8 16; do
+  OMP_NUM_THREADS=$t ./ex5
+done
+
+
+System size        :   120
+Iterations         :  108
+Norme              :  2.194E-16
+Elapsed time       :  1.274E-02 sec.
+CPU time           :  1.275E-02 sec.
+
+
+System size        :   120
+Iterations         :  108
+Norme              :  2.194E-16
+Elapsed time       :  8.501E-03 sec.
+CPU time           :  8.505E-03 sec.
+
+
+System size        :   120
+Iterations         :  108
+Norme              :  2.194E-16
+Elapsed time       :  6.407E-03 sec.
+CPU time           :  6.411E-03 sec.
+
+
+System size        :   120
+Iterations         :  108
+Norme              :  2.194E-16
+Elapsed time       :  6.255E-02 sec.
+CPU time           :  6.256E-02 sec.
+
+
+System size        :   120
+Iterations         :  108
+Norme              :  2.194E-16
+Elapsed time       :  6.855E-01 sec.
+CPU time           :  6.855E-01 sec.

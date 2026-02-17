@@ -1,0 +1,8 @@
+Parallel for num_threads = 4 :
+root@MyLen:/mnt/c/Users/youne/OneDrive/Desktop/UM6P-CS/CI/S4/Parall/TPs/Tp3/ex2# ./ex2
+Time = 0.000969
+pi = 3.141593
+for num_threads = 1 :
+root@MyLen:/mnt/c/Users/youne/OneDrive/Desktop/UM6P-CS/CI/S4/Parall/TPs/Tp3/ex2# ./ex2
+Time = 0.001439
+pi = 3.141593
