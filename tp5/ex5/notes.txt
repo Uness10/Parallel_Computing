@@ -1,0 +1,15 @@
+Based on the generated plots for Speedup and Efficiency vs Number of Processes (P) for the Pi calculation:
+
+1. **Speedup Observation**:
+   - Unlike the matrix-vector multiplication in the previous exercise, the Pi calculation demonstrates a noticeable speedup as the number of processes increases.
+   - For larger values of N (e.g., N=10^8), the speedup scales reasonably well up to P=4, reaching a speedup of approximately 3x to 4x.
+   - However, beyond P=4, the speedup curve begins to flatten out. For instance, at P=16, the speedup does not increase proportionally and remains around 3.5x to 4x. This indicates diminishing returns as more processes are added.
+
+2. **Efficiency Observation**:
+   - The efficiency starts relatively high (around 0.8 to 1.0) for a small number of processes (P=1, P=2).
+   - As the number of processes increases, the efficiency steadily declines. By the time P reaches 16, the efficiency drops significantly to around 0.2.
+   - This decline in efficiency suggests that while adding more processes decreases the overall execution time initially, the overhead of managing these processes and the final reduction operation (`MPI_Reduce`) begins to outweigh the benefits of parallel computation.
+
+3. **Conclusion**:
+   - The Pi calculation is a compute-bound problem with a high computation-to-communication ratio, which makes it much more suitable for parallelization compared to the matrix-vector multiplication.
+   - The parallel implementation successfully reduces execution time, especially for large N. However, the scalability is limited by Amdahl's Law and the communication overhead of the reduction step, leading to a plateau in speedup and a drop in efficiency for higher process counts.

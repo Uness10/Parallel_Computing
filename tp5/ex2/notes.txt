@@ -1,0 +1,14 @@
+yns@MyLen:/mnt/c/Users/youne/OneDrive/Desktop/UM6P-CS/CI/S4/Parall/TPs/tp5/ex2$ mpirun -np 5 ex2
+1
+Rank 0 received 1
+Rank 1 received 1
+Rank 4 received 1
+Rank 2 received 1
+Rank 3 received 1
+100
+Rank 4 received 100
+Rank 0 received 100
+Rank 1 received 100
+Rank 2 received 100
+Rank 3 received 100
+-2

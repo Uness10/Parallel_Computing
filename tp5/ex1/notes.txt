@@ -1,0 +1,19 @@
+Qst1:
+    yns@MyLen:/mnt/c/Users/youne/OneDrive/Desktop/UM6P-CS/CI/S4/Parall/TPs/tp5/ex1$ mpirun -np 5 ex1
+    Hello World, from process 0
+    Hello World, from process 2
+    Hello World, from process 1
+    Hello World, from process 3
+    Hello World, from process 4
+Qst2:
+    yns@MyLen:/mnt/c/Users/youne/OneDrive/Desktop/UM6P-CS/CI/S4/Parall/TPs/tp5/ex1$ mpirun -np 5 ex1
+    I am process 2 among 5
+    I am process 1 among 5
+    I am process 0 among 5
+    I am process 3 among 5
+    I am process 4 among 5
+Qst3
+    yns@MyLen:/mnt/c/Users/youne/OneDrive/Desktop/UM6P-CS/CI/S4/Parall/TPs/tp5/ex1$ mpirun -np 5 ex1
+    I am process 1 among 5
+Qst4:
+    MPI runtime may not flush buffered output, may not cleanly release resources, and the job can hang or be aborted by mpirun. 

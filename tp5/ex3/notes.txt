@@ -1,0 +1,7 @@
+yns@MyLen:/mnt/c/Users/youne/OneDrive/Desktop/UM6P-CS/CI/S4/Parall/TPs/tp5/ex3$ mpirun -np 5 ex3
+10
+Process 0 received: 10
+Process 1 received: 11
+Process 2 received: 13
+Process 3 received: 16
+Process 4 received: 20

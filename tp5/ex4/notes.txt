@@ -1,0 +1,16 @@
+Based on the generated plots for Speedup and Efficiency vs Number of Processes (P):
+
+1. **Speedup Observation**:
+   - The speedup is extremely poor across all matrix sizes (N) and number of processes (P). It stays well below 1, meaning the parallel version is actually slower than the serial version.
+   - Even as the number of processes increases, the speedup does not scale and remains flat, far below the "Ideal Speedup" line.
+   - There is a slight improvement for larger matrix sizes (e.g., N=1024) compared to smaller ones, but it is still negligible.
+
+2. **Efficiency Observation**:
+   - The efficiency is also very low, starting below 0.5 even for P=1 and dropping sharply as the number of processes increases.
+   - For P > 1, the efficiency is close to 0, indicating that the added processes are not contributing effectively to the computation.
+   - The efficiency is far below the "Ideal Efficiency" line of 1.0.
+
+3. **Conclusion**:
+   - The parallel implementation is highly inefficient. The communication overhead (e.g., `MPI_Bcast`, `MPI_Scatterv`, `MPI_Gatherv`) heavily outweighs the computation time, especially for the relatively small matrix sizes tested (up to N=1024).
+   - Matrix-vector multiplication has a low computation-to-communication ratio ($O(N^2)$ computation vs $O(N^2)$ communication for the matrix). Distributing the matrix and gathering the results takes more time than simply computing the result on a single processor.
+   - To see any meaningful speedup, the matrix size N would need to be significantly larger to ensure the computation time dominates the communication overhead.

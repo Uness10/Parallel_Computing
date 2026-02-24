@@ -1,0 +1,4 @@
+lamnodes
+echo localhost > lamhosts
+lamboot lamhosts
+mpirun -np 5 ex1
