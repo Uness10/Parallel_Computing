@@ -1,0 +1,37 @@
+Running with 1 processes...
+  Time: 0.079 seconds
+Running with 2 processes...
+  Time: 0.042 seconds
+Running with 4 processes...
+  Time: 0.022 seconds
+Running with 7 processes...
+  Time: 0.014 seconds
+Running with 8 processes...
+  Time: 0.012 seconds
+Running with 14 processes...
+  Time: 0.009 seconds
+Running with 16 processes...
+  Time: 0.008 seconds
+Running with 28 processes...
+  Time: 0.007 seconds
+Running with 32 processes...
+  Time: 0.007 seconds
+Running with 48 processes...
+  Time: 0.007 seconds
+Running with 56 processes...
+  Time: 0.099 seconds
+
+Scaling results saved to scaling_results.csv
+
+processes,time,samples
+1,0.079,100000
+2,0.042,100000
+4,0.022,100000
+7,0.014,100000
+8,0.012,100000
+14,0.009,100000
+16,0.008,100000
+28,0.007,100000
+32,0.007,100000
+48,0.007,100000
+56,0.099,100000

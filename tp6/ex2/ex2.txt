@@ -1,0 +1,108 @@
+================================================================================
+            EXERCISE 2: Distributed Gradient Descent with MPI Derived Types
+================================================================================
+
+COMPILATION AND EXECUTION:
+--------------------------
+    # Compile
+    $ mpicc -Wall -O2 -o distrib_grad distrib_grad.c -lm
+
+    # Run with 4 processes
+    $ mpirun -np 4 ./distrib_grad
+
+    # Run scaling test
+    $ sbatch run_scaling.sh
+
+
+RESULTS:
+--------------------------
+
+1. Run with 4 processes
+    `
+    Training with 1000 samples distributed across 4 processes
+    True weights: w[0]=2.0000, w[1]=-1.0000
+
+    Epoch 10 | Loss (MSE): 1.537902 | w[0]: 0.1343, w[1]: -0.0684
+    Epoch 20 | Loss (MSE): 1.338170 | w[0]: 0.2596, w[1]: -0.1322
+    Epoch 30 | Loss (MSE): 1.164437 | w[0]: 0.3764, w[1]: -0.1915
+    Epoch 40 | Loss (MSE): 1.013319 | w[0]: 0.4855, w[1]: -0.2469
+    Epoch 50 | Loss (MSE): 0.881872 | w[0]: 0.5872, w[1]: -0.2984
+    Epoch 60 | Loss (MSE): 0.767535 | w[0]: 0.6821, w[1]: -0.3464
+    Epoch 70 | Loss (MSE): 0.668080 | w[0]: 0.7706, w[1]: -0.3911
+    Epoch 80 | Loss (MSE): 0.581571 | w[0]: 0.8532, w[1]: -0.4328
+    Epoch 90 | Loss (MSE): 0.506322 | w[0]: 0.9303, w[1]: -0.4716
+    Epoch 100 | Loss (MSE): 0.440868 | w[0]: 1.0021, w[1]: -0.5078
+    Epoch 110 | Loss (MSE): 0.383934 | w[0]: 1.0692, w[1]: -0.5415
+    Epoch 120 | Loss (MSE): 0.334410 | w[0]: 1.1318, w[1]: -0.5728
+    Epoch 130 | Loss (MSE): 0.291332 | w[0]: 1.1901, w[1]: -0.6021
+    Epoch 140 | Loss (MSE): 0.253860 | w[0]: 1.2446, w[1]: -0.6293
+    Epoch 150 | Loss (MSE): 0.221266 | w[0]: 1.2954, w[1]: -0.6547
+    Epoch 160 | Loss (MSE): 0.192915 | w[0]: 1.3428, w[1]: -0.6783
+    Epoch 170 | Loss (MSE): 0.168253 | w[0]: 1.3870, w[1]: -0.7003
+    Epoch 180 | Loss (MSE): 0.146801 | w[0]: 1.4282, w[1]: -0.7208
+    Epoch 190 | Loss (MSE): 0.128141 | w[0]: 1.4667, w[1]: -0.7399
+    Epoch 200 | Loss (MSE): 0.111910 | w[0]: 1.5026, w[1]: -0.7577
+    Epoch 210 | Loss (MSE): 0.097791 | w[0]: 1.5361, w[1]: -0.7743
+    Epoch 220 | Loss (MSE): 0.085510 | w[0]: 1.5674, w[1]: -0.7897
+    Epoch 230 | Loss (MSE): 0.074827 | w[0]: 1.5965, w[1]: -0.8041
+    Epoch 240 | Loss (MSE): 0.065534 | w[0]: 1.6237, w[1]: -0.8175
+    Epoch 250 | Loss (MSE): 0.057451 | w[0]: 1.6491, w[1]: -0.8300
+    Epoch 260 | Loss (MSE): 0.050420 | w[0]: 1.6728, w[1]: -0.8416
+    Epoch 270 | Loss (MSE): 0.044304 | w[0]: 1.6949, w[1]: -0.8524
+    Epoch 280 | Loss (MSE): 0.038983 | w[0]: 1.7155, w[1]: -0.8625
+    Epoch 290 | Loss (MSE): 0.034355 | w[0]: 1.7347, w[1]: -0.8719
+    Epoch 300 | Loss (MSE): 0.030330 | w[0]: 1.7526, w[1]: -0.8807
+    Epoch 310 | Loss (MSE): 0.026828 | w[0]: 1.7694, w[1]: -0.8888
+    Epoch 320 | Loss (MSE): 0.023782 | w[0]: 1.7850, w[1]: -0.8964
+    Epoch 330 | Loss (MSE): 0.021132 | w[0]: 1.7995, w[1]: -0.9035
+    Epoch 340 | Loss (MSE): 0.018827 | w[0]: 1.8131, w[1]: -0.9101
+    Epoch 350 | Loss (MSE): 0.016822 | w[0]: 1.8258, w[1]: -0.9162
+    Epoch 360 | Loss (MSE): 0.015078 | w[0]: 1.8376, w[1]: -0.9219
+    Epoch 370 | Loss (MSE): 0.013561 | w[0]: 1.8487, w[1]: -0.9272
+    Epoch 380 | Loss (MSE): 0.012242 | w[0]: 1.8589, w[1]: -0.9322
+    Epoch 390 | Loss (MSE): 0.011094 | w[0]: 1.8686, w[1]: -0.9368
+    Epoch 400 | Loss (MSE): 0.010095 | w[0]: 1.8775, w[1]: -0.9411
+
+    Early stopping at epoch 402 — loss 0.009911 < 1.0e-02
+
+    Final weights: w[0]=1.8792, w[1]=-0.9419
+    Training time: 0.002 seconds (MPI with 4 processes)`
+
+    Analysis:
+    - 
+2. Scaling experiment
+    To run scaling experiments on Toubkal (1 to 56 cores):
+
+    1. Submit the SLURM job:
+    $ sbatch run_scaling.sh
+
+    2. Results will be saved to scaling_results.csv
+
+    3. Use plot_scaling.py to generate speedup/efficiency plots
+
+    SCALING RESULTS (100,000 samples):
+    ----------------------------------
+    | Processes | Time (s) | Speedup | Efficiency |
+    |-----------|----------|---------|------------|
+    |     1     |  0.079   |  1.00x  |   100.0%   |
+    |     2     |  0.042   |  1.88x  |    94.0%   |
+    |     4     |  0.022   |  3.59x  |    89.8%   |
+    |     7     |  0.014   |  5.64x  |    80.6%   |
+    |     8     |  0.012   |  6.58x  |    82.3%   |
+    |    14     |  0.009   |  8.78x  |    62.7%   |
+    |    16     |  0.008   |  9.88x  |    61.7%   |
+    |    28     |  0.007   | 11.29x  |    40.3%   |
+    |    32     |  0.007   | 11.29x  |    35.3%   |
+    |    48     |  0.007   | 11.29x  |    23.5%   |
+    |    56     |  0.099   |  0.80x  |     1.4%   |
+
+    Maximum speedup achieved: 11.29x with 28-48 processes
+
+    ANALYSIS:
+    - Good scaling up to 16 processes (>60% efficiency)
+    - Performance plateaus at 28+ processes (0.007s floor)
+    - 56-process anomaly: crossing node boundary causes high
+    inter-node communication overhead (slower than 1 process!)
+    - Problem size (100K samples) too small for 56 cores
+    - Amdahl's law limits max speedup due to serial portions
+
